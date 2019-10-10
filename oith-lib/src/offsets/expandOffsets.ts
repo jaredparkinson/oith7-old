@@ -1,4 +1,4 @@
-import { flatten, range } from 'lodash';
+import { flatten, range, uniq, sortBy } from 'lodash';
 import { Offset } from '../verse-notes/verse-note';
 import { of, Observable } from 'rxjs';
 import { filterUndefinedNull$ } from '../rx/argv$';
@@ -20,3 +20,39 @@ export function expandOffsets(offsets: Offset): Observable<number[]> {
     map(o => (offsets.uncompressedOffsets = o)),
   );
 }
+export function compressRanges(array: number[]): [number, number][] {
+  const ranges: [number, number][] = [];
+  let rstart: number, rend: number;
+  const sortedArray = uniq(
+    sortBy(array, (u): number => {
+      return u;
+    }),
+  );
+  for (let i = 0; i < sortedArray.length; i++) {
+    rstart = sortedArray[i];
+    rend = rstart;
+    while (sortedArray[i + 1] - sortedArray[i] === 1) {
+      rend = sortedArray[i + 1]; // increment the index if the numbers sequential
+      i++;
+    }
+    ranges.push(rstart === rend ? [rstart, rstart] : [rstart, rend]);
+  }
+
+  return ranges.filter((range): boolean => {
+    // (typeof range[0]);
+    return isNaN(range[0]) === false && isNaN(range[1]) === false;
+  });
+}
+
+export function getRanges(array?: number[]): Observable<string> {
+  return of(array).pipe(
+    map(o => compressRanges(o)),
+    flatMap$,
+    distinctUntilChanged(),
+    map(o => o.join('-')),
+    toArray(),
+    map(o => o.join(',')),
+  );
+}
+
+export const getRanges$ = map((o: number[]) => getRanges(o));
