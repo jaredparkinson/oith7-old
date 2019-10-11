@@ -49,7 +49,9 @@ export function getRanges(array?: number[]): Observable<string> {
     map(o => compressRanges(o)),
     flatMap$,
     distinctUntilChanged(),
-    map(o => o.join('-')),
+    map(o => {
+      return o[0] === o[1] ? `${o[0]}` : o.join('-');
+    }),
     toArray(),
     map(o => o.join(',')),
   );
