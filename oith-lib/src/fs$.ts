@@ -7,10 +7,24 @@ import {
   WriteOptions,
   MoveOptions,
   EnsureOptions,
+  emptyDir,
+  writeFile,
 } from 'fs-extra';
 import { flatMap$ } from './main';
+import normalizePath = require('normalize-path');
+import { map } from 'rxjs/operators';
 export function readFile$(fileName: string): Observable<Buffer> {
   return of(readFile(fileName)).pipe(flatMap$);
+}
+
+export function writeFile$(fileName: string, data: string | Buffer) {
+  return of(writeFile(fileName, data)).pipe(flatMap$);
+}
+
+export const readFileMap = map((i: string) => readFile$(i));
+
+export function emptyDir$(pathName: string) {
+  return of(emptyDir(normalizePath(pathName))).pipe(flatMap$);
 }
 
 // export function copy$(src: string, dest: string, options?: CopyOptions): Observable<void>{return of(copy(src,dest,options)).pipe(flatMap$)}
