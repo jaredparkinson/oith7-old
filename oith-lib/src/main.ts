@@ -8,6 +8,7 @@ import { argv } from 'yargs';
 import FastGlob from 'fast-glob';
 import AdmZip from 'adm-zip';
 import cuid = require('cuid');
+import { process } from './process';
 export class ChapterProcessor {
   public chapterProcessor = map((document: Document) => {
     of(document.querySelectorAll('body > *'));
@@ -15,7 +16,7 @@ export class ChapterProcessor {
 }
 
 const cache = normalizePath('./.cache');
-const unzipPath = normalizePath(`${cache}/unzip`);
+export const unzipPath = normalizePath(`${cache}/unzip`);
 const flatPath = normalizePath(`${cache}/unzip`);
 
 // const inputFolder = of(argv.i as string);
@@ -79,6 +80,8 @@ forkJoin(hasArg('ns', 'string'), hasArg('i', 'string'))
     flatMap$,
     map(() => unzipFiles(argv.i as string)),
     flatMap$,
+    map(() => process()),
+    flatMap(o => o),
   )
   .subscribe(o => o);
 
