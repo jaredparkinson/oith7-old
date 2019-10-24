@@ -1,4 +1,4 @@
-import { map, filter, flatMap } from 'rxjs/operators';
+import { map, filter, flatMap, toArray } from 'rxjs/operators';
 import { readFile$ } from './fs$';
 import { JSDOM } from 'jsdom';
 import { fastGlob$, unzipPath, flatMap$ } from './main';
@@ -55,6 +55,9 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
       }
       return EMPTY;
     }),
+    flatMap$,
+    toArray(),
+    map(o => console.log(o.length)),
   );
   // .pipe(toArray());
 }

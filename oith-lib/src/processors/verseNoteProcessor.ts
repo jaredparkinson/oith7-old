@@ -83,7 +83,7 @@ function parseNoteMap(
   );
 }
 
-export function parseNotes(
+function parseNotes(
   verseNoteElement: Element,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
@@ -96,7 +96,7 @@ export function parseNotes(
   );
 }
 
-export function parseVerseNote(
+function parseVerseNote(
   verseNoteElement: Element,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
