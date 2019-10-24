@@ -1,5 +1,6 @@
 import cuid = require('cuid');
 import { expandOffsets } from '../offsets/expandOffsets';
+import { NoteCategory } from './settings/note-gorup-settings';
 
 export const enum DocType {
   VERSENOTE,
@@ -10,7 +11,15 @@ export class Doc {
   public docType: DocType;
 }
 
-export class NoteRef {}
+export class NoteRef {
+  public noteCategory?: number;
+  public text?: string;
+  public visible?: boolean;
+  public constructor(noteC: NoteCategory, text: string) {
+    this.noteCategory = noteC.noteCategory;
+    this.text = text;
+  }
+}
 
 export default class Note extends Doc {
   public id: string;

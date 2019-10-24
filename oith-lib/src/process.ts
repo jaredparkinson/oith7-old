@@ -2,7 +2,13 @@ import { map, filter, flatMap } from 'rxjs/operators';
 import { readFile$ } from './fs$';
 import { JSDOM } from 'jsdom';
 import { fastGlob$, unzipPath, flatMap$ } from './main';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, EMPTY } from 'rxjs';
+import {
+  NoteGroupSettings,
+  NoteOverlays as NoteTypes,
+  NoteCategories,
+} from './verse-notes/settings/note-gorup-settings';
+import { verseNoteProcessor } from './processors/verseNoteProcessor';
 
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
@@ -16,13 +22,38 @@ export function getFileType(document: Document) {
   );
 }
 
-export function process() {
+export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
   return loadFiles().pipe(
     map(d => forkJoin(of(d), getFileType(d))),
     flatMap(o => o),
     map(([d, t]) => {
       d;
-      console.log(t);
+
+      switch (t) {
+        case 'chapter':
+        case 'figure':
+        case 'section':
+        case 'book':
+        case 'topic': {
+          break;
+        }
+        case 'manifest': {
+          break;
+        }
+        case 'overlay-note': {
+          return verseNoteProcessor(d, noteTypes, noteCategories);
+          break;
+        }
+        default: {
+          const ti = d.querySelector('title') as HTMLTitleElement;
+          console.log(ti ? ti.innerHTML : '');
+
+          console.log(t);
+
+          return EMPTY;
+        }
+      }
+      return EMPTY;
     }),
   );
   // .pipe(toArray());
