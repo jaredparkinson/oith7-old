@@ -93,7 +93,7 @@ export class NoteType {
   }
 }
 
-export class NoteOverlays {
+export class NoteTypes {
   public _id: string;
   public _rev?: string;
   public noteTypes: NoteType[];

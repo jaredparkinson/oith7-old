@@ -2,7 +2,13 @@ import { flatten, range, uniq, sortBy } from 'lodash';
 import { Offset } from '../verse-notes/verse-note';
 import { of, Observable } from 'rxjs';
 import { filterUndefinedNull$ } from '../rx/argv$';
-import { flatMap, map, toArray, distinctUntilChanged } from 'rxjs/operators';
+import {
+  flatMap,
+  map,
+  toArray,
+  distinctUntilChanged,
+  filter,
+} from 'rxjs/operators';
 import { flatMap$ } from '../main';
 export function expandOffsets(offsets: Offset): Observable<number[]> {
   return of(offsets.offsets as string).pipe(
@@ -45,7 +51,11 @@ export function compressRanges(array: number[]): [number, number][] {
 }
 
 export function getRanges(array?: number[]): Observable<string> {
+  if (!array) {
+    return of('');
+  }
   return of(array).pipe(
+    filter(o => o !== undefined),
     map(o => compressRanges(o)),
     flatMap$,
     distinctUntilChanged(),

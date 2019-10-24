@@ -15,8 +15,8 @@ export class NoteRef {
   public noteCategory?: number;
   public text?: string;
   public visible?: boolean;
-  public constructor(noteC: NoteCategory, text: string) {
-    this.noteCategory = noteC.noteCategory;
+  public constructor(noteC: number, text: string) {
+    this.noteCategory = noteC;
     this.text = text;
   }
 }

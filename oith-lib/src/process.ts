@@ -5,7 +5,7 @@ import { fastGlob$, unzipPath, flatMap$ } from './main';
 import { forkJoin, of, EMPTY } from 'rxjs';
 import {
   NoteGroupSettings,
-  NoteOverlays as NoteTypes,
+  NoteTypes,
   NoteCategories,
 } from './verse-notes/settings/note-gorup-settings';
 import { verseNoteProcessor } from './processors/verseNoteProcessor';

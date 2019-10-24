@@ -4,6 +4,7 @@ import {
   NoteCategory,
   NoteCategories,
   NoteType,
+  NoteTypes,
 } from '../verse-notes/settings/note-gorup-settings';
 import { flatMap$ } from '../rx/flatMap$';
 import { parseLanguage } from './parseLanguage';
@@ -23,7 +24,7 @@ const parseNoteCategoryMap = map((noteCategoryElement: Element) => {
     .pipe(
       map(
         ([name, sN, cls, nt]): NoteType => {
-          return new NoteType(name, sN, cls, false, parseInt(nT, 10));
+          return new NoteType(name, sN, cls, false, parseInt(nt, 10));
         },
       ),
     );
@@ -40,8 +41,8 @@ export function noteTypeProcessor(docuemnt: Document) {
     ),
   ).pipe(
     map(
-      ([lang, noteCategories]): NoteCategories => {
-        return new NoteCategories(`${lang}-note-types`, noteCategories, []);
+      ([lang, noteCategories]): NoteTypes => {
+        return new NoteTypes(`${lang}-note-types`, noteCategories);
       },
     ),
   );

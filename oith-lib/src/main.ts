@@ -1,14 +1,22 @@
 import { Observable, of, forkJoin } from 'rxjs';
-import { flatMap, map, filter, toArray } from 'rxjs/operators';
+import { flatMap, map, filter, toArray, retry } from 'rxjs/operators';
 import { emptyDir } from 'fs-extra';
 import normalizePath = require('normalize-path');
-import { emptyDir$, readFileMap, writeFile$ } from './fs$';
+import { emptyDir$, readFileMap, writeFile$, readFile$ } from './fs$';
 import { argv$ } from './rx/argv$';
 import { argv } from 'yargs';
 import FastGlob from 'fast-glob';
-import AdmZip from 'adm-zip';
+import AdmZip, { IZipEntry } from 'adm-zip';
 import cuid = require('cuid');
-import { process } from './process';
+import { process, filterUndefined$ } from './process';
+import {
+  NoteType,
+  NoteTypes,
+  NoteCategories,
+} from './verse-notes/settings/note-gorup-settings';
+import { noteCategoryProcessor } from './processors/note-categories-processor';
+import { JSDOM } from 'jsdom';
+import { noteTypeProcessor } from './processors/note-types-processor';
 export class ChapterProcessor {
   public chapterProcessor = map((document: Document) => {
     of(document.querySelectorAll('body > *'));
@@ -74,13 +82,47 @@ export function unzipFiles(pathName: string): Observable<void[]> {
   // return fast
 }
 
+export function loadnoteSettings(): Observable<[NoteTypes, NoteCategories]> {
+  return readFile$(argv.ns as string)
+    .pipe(
+      map(o => new AdmZip(o).getEntries()),
+      map(o => {
+        return forkJoin(
+          of(o.find(i => i.name === 'note_types.html') as IZipEntry).pipe(
+            filterUndefined$,
+            map(i => noteTypeProcessor(new JSDOM(i.getData()).window.document)),
+            flatMap$,
+          ),
+          of(o.find(i => i.name === 'note_categories.html') as IZipEntry).pipe(
+            filterUndefined$,
+            map(i =>
+              noteCategoryProcessor(new JSDOM(i.getData()).window.document),
+            ),
+            flatMap$,
+          ),
+        );
+      }),
+    )
+    .pipe(flatMap(o => o));
+}
+
 forkJoin(hasArg('ns', 'string'), hasArg('i', 'string'))
   .pipe(
     map(() => prepCache()),
     flatMap$,
     map(() => unzipFiles(argv.i as string)),
     flatMap$,
-    map(() => process()),
+    map(() => {
+      return loadnoteSettings().pipe(
+        map(([nt, nc]) => {
+          console.log(nt);
+          console.log(nc);
+          // return of(nt);
+          return process(nt, nc);
+        }),
+        flatMap$,
+      );
+    }),
     flatMap(o => o),
   )
   .subscribe(o => o);

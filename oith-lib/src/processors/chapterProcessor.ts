@@ -1,1 +1,3 @@
-export function chapterProcessor(document: Document) {}
+export function chapterProcessor(document: Document) {
+  document;
+}

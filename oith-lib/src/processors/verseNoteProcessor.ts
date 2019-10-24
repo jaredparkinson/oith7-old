@@ -1,5 +1,5 @@
 import {
-  NoteOverlays as NoteTypes,
+  NoteTypes,
   NoteCategories,
 } from '../verse-notes/settings/note-gorup-settings';
 import { of, forkJoin } from 'rxjs';
@@ -9,6 +9,7 @@ import Note, { NoteRef, VerseNote } from '../verse-notes/verse-note';
 
 function parseVerseNoteElementID(element: Element) {
   if (element.id === '') {
+    console.log('throw 1');
     throw element.innerHTML;
   }
   return of(element.id);
@@ -18,6 +19,7 @@ function parseNoteType(noteElement: Element, noteTypes: NoteTypes) {
   return of(noteTypes.noteTypes).pipe(
     flatMap$,
     find(o => o.className === noteElement.className),
+    map(o => (o ? o.noteType : -1)),
   );
 }
 
@@ -30,13 +32,15 @@ function parseNoteCategory(
   );
   if (nc) {
     noteRefLabel.remove();
-    return of(nc);
+    return of(nc.noteCategory);
   }
-  throw noteRefLabel.innerHTML;
+  console.log(`Not valid ${noteRefLabel.outerHTML}`);
+  return of(-1);
+  // throw noteRefLabel.innerHTML;
 }
 function parseNoteRef(noteRefElement: Element, noteCategories: NoteCategories) {
   const refLabelElement = noteRefElement.querySelector(
-    'class*="reference-label"',
+    '[class*="reference-label"]',
   );
   if (refLabelElement) {
     return parseNoteCategory(refLabelElement, noteCategories).pipe(
@@ -47,7 +51,8 @@ function parseNoteRef(noteRefElement: Element, noteCategories: NoteCategories) {
       ),
     );
   }
-  throw refLabelElement.innerHTML;
+  console.log('throw 3');
+  throw noteRefElement.innerHTML;
 }
 
 function parseNotePhrase(noteE: Element) {
@@ -57,6 +62,7 @@ function parseNotePhrase(noteE: Element) {
     return of(notePhraseElement.innerHTML);
   }
 
+  console.log('throw 4');
   throw noteE.id;
 }
 
@@ -78,7 +84,7 @@ function parseNoteMap(
     ),
   ).pipe(
     map(([notePhrase, noteType, noteRefts]) => {
-      return new Note(noteElement.id, noteRefts, noteType.noteType, notePhrase);
+      return new Note(noteElement.id, noteRefts, noteType, notePhrase);
     }),
   );
 }
