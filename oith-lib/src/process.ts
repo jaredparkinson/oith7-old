@@ -18,6 +18,7 @@ import {
 import { verseNoteProcessor } from './processors/verseNoteProcessor';
 import cuid = require('cuid');
 import { parseDocID } from './processors/parseDocID';
+import { chapterProcessor } from './processors/chapterProcessor';
 
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
@@ -44,8 +45,7 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
         case 'section':
         // case 'book':
         case 'topic': {
-          return parseDocID(d).pipe(flatMap$);
-          break;
+          return chapterProcessor(d).pipe(flatMap$);
         }
         case 'book':
         case 'manifest': {
@@ -82,7 +82,7 @@ function loadFiles() {
           file =>
             new JSDOM(file, {
               contentType:
-                o.split('.').pop() === 'html' ? 'text/html' : 'text/xml',
+                o.split('.').pop() === 'html' ? 'text/xml' : 'text/xml',
             }).window.document,
         ),
       ),
