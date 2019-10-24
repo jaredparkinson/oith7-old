@@ -1,7 +1,7 @@
-import { map, filter, flatMap, toArray } from 'rxjs/operators';
-import { readFile$ } from './fs$';
+import { map, filter, flatMap, toArray, bufferCount } from 'rxjs/operators';
+import { readFile$, writeFile$ } from './fs$';
 import { JSDOM } from 'jsdom';
-import { fastGlob$, unzipPath, flatMap$ } from './main';
+import { fastGlob$, unzipPath, flatMap$, sortPath } from './main';
 import { forkJoin, of, EMPTY } from 'rxjs';
 import {
   NoteGroupSettings,
@@ -9,6 +9,7 @@ import {
   NoteCategories,
 } from './verse-notes/settings/note-gorup-settings';
 import { verseNoteProcessor } from './processors/verseNoteProcessor';
+import cuid = require('cuid');
 
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
@@ -55,9 +56,10 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
       }
       return EMPTY;
     }),
-    flatMap$,
+    flatMap(o => o),
+    bufferCount(100),
+    map(o => writeFile$(`${sortPath}/${cuid()}.json`, JSON.stringify(o))),
     toArray(),
-    map(o => console.log(o.length)),
   );
   // .pipe(toArray());
 }

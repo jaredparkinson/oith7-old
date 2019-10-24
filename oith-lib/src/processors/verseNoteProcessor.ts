@@ -4,7 +4,7 @@ import {
 } from '../verse-notes/settings/note-gorup-settings';
 import { of, forkJoin } from 'rxjs';
 import { flatMap$ } from '../main';
-import { flatMap, map, find, toArray } from 'rxjs/operators';
+import { flatMap, map, find, toArray, filter } from 'rxjs/operators';
 import Note, { NoteRef, VerseNote } from '../verse-notes/verse-note';
 
 function parseVerseNoteElementID(element: Element) {
@@ -109,7 +109,9 @@ function parseVerseNote(
 ) {
   return forkJoin(
     parseVerseNoteElementID(verseNoteElement),
-    parseNotes(verseNoteElement, noteTypes, noteCategories),
+    parseNotes(verseNoteElement, noteTypes, noteCategories).pipe(
+      filter(o => o.length > 0),
+    ),
   ).pipe(
     map(([id, notes]) => {
       return new VerseNote(id, notes);

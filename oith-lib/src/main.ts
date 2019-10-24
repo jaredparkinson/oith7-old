@@ -25,7 +25,8 @@ export class ChapterProcessor {
 
 const cache = normalizePath('./.cache');
 export const unzipPath = normalizePath(`${cache}/unzip`);
-const flatPath = normalizePath(`${cache}/unzip`);
+export const flatPath = normalizePath(`${cache}/unzip`);
+export const sortPath = normalizePath(`${cache}/sort`);
 
 // const inputFolder = of(argv.i as string);
 
@@ -38,7 +39,9 @@ export function hasArg(arg: string, argType: string) {
 
 export function prepCache() {
   return emptyDir$(cache).pipe(
-    map(() => forkJoin(emptyDir$(unzipPath), emptyDir$(flatPath))),
+    map(() =>
+      forkJoin(emptyDir$(unzipPath), emptyDir$(flatPath), emptyDir$(sortPath)),
+    ),
     flatMap$,
   );
 }
