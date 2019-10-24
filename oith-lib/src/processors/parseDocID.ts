@@ -1,4 +1,6 @@
 import { EMPTY } from 'rxjs';
+import { parseLanguage } from './parseLanguage';
+import { map } from 'rxjs/operators';
 export function parseDocID(docuemnt: Document) {
   const htmlE = docuemnt.querySelector('html');
   if (htmlE && htmlE.hasAttribute('data-uri')) {
@@ -9,7 +11,14 @@ export function parseDocID(docuemnt: Document) {
 
     if (r) {
       console.log(r);
-      return EMPTY;
+
+      return parseLanguage(docuemnt).pipe(
+        map(l => {
+          console.log(`${l}-${r[1]}-r[2]`);
+
+          return EMPTY;
+        }),
+      );
     }
     // console.log(htmlE.innerHTML);
 

@@ -44,7 +44,7 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
         case 'section':
         // case 'book':
         case 'topic': {
-          return parseDocID(d);
+          return parseDocID(d).pipe(flatMap$);
           break;
         }
         case 'book':
