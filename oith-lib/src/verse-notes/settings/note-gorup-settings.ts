@@ -76,7 +76,7 @@ export class NoteType {
   public className: string;
   public name: string;
   public shortName: string;
-  public sort: number;
+  public noteType: number;
   public visibility: boolean;
   public constructor(
     name: string,
@@ -89,7 +89,7 @@ export class NoteType {
     this.shortName = shortName;
     this.className = className;
     this.visibility = visibility;
-    this.sort = sort;
+    this.noteType = sort;
   }
 }
 

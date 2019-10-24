@@ -4,20 +4,20 @@ import {
 } from '../verse-notes/settings/note-gorup-settings';
 import { of, forkJoin } from 'rxjs';
 import { flatMap$ } from '../main';
-import { flatMap, map, find } from 'rxjs/operators';
-import { NoteRef } from '../verse-notes/verse-note';
+import { flatMap, map, find, toArray } from 'rxjs/operators';
+import Note, { NoteRef, VerseNote } from '../verse-notes/verse-note';
 
-function parseID(e: Element) {
-  if (e.id === '') {
-    throw e.innerHTML;
+function parseVerseNoteElementID(element: Element) {
+  if (element.id === '') {
+    throw element.innerHTML;
   }
-  return of(e.id);
+  return of(element.id);
 }
 
-function parseNoteType(noteE: Element, noteTypes: NoteTypes) {
+function parseNoteType(noteElement: Element, noteTypes: NoteTypes) {
   return of(noteTypes.noteTypes).pipe(
     flatMap$,
-    find(o => o.className === noteE.className),
+    find(o => o.className === noteElement.className),
   );
 }
 
@@ -34,38 +34,81 @@ function parseNoteCategory(
   }
   throw noteRefLabel.innerHTML;
 }
-function parseNoteRef(noteRefE: Element, noteCategories: NoteCategories) {
-  const refLabelE = noteRefE.querySelector('class*="reference-label"');
-  if (refLabelE) {
-    return parseNoteCategory(refLabelE, noteCategories).pipe(
+function parseNoteRef(noteRefElement: Element, noteCategories: NoteCategories) {
+  const refLabelElement = noteRefElement.querySelector(
+    'class*="reference-label"',
+  );
+  if (refLabelElement) {
+    return parseNoteCategory(refLabelElement, noteCategories).pipe(
       map(
         (noteCategory): NoteRef => {
-          return new NoteRef(noteCategory, noteRefE.innerHTML);
+          return new NoteRef(noteCategory, noteRefElement.innerHTML);
         },
       ),
     );
   }
-  throw refLabelE.innerHTML;
+  throw refLabelElement.innerHTML;
+}
+
+function parseNotePhrase(noteE: Element) {
+  const notePhraseElement = noteE.querySelector('.note-phrase');
+
+  if (notePhraseElement) {
+    return of(notePhraseElement.innerHTML);
+  }
+
+  throw noteE.id;
 }
 
 function parseNoteMap(
-  noteE: Element,
+  noteElement: Element,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
-) {}
+) {
+  return forkJoin(
+    parseNotePhrase(noteElement),
+    parseNoteType(noteElement, noteTypes),
+    of(noteElement.querySelectorAll('.note-reference')).pipe(
+      flatMap(o => o),
+      map(nre => {
+        return parseNoteRef(nre, noteCategories);
+      }),
+      flatMap$,
+      toArray(),
+    ),
+  ).pipe(
+    map(([notePhrase, noteType, noteRefts]) => {
+      return new Note(noteElement.id, noteRefts, noteType.noteType, notePhrase);
+    }),
+  );
+}
 
 export function parseNotes(
   verseNoteElement: Element,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
-) {}
+) {
+  return of(verseNoteElement.querySelectorAll('note')).pipe(
+    flatMap(o => o),
+    map(o => parseNoteMap(o, noteTypes, noteCategories)),
+    flatMap$,
+    toArray(),
+  );
+}
 
 export function parseVerseNote(
   verseNoteElement: Element,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
 ) {
-  return forkJoin(parseID(verseNoteElement)).pipe(map(([id]) => {}));
+  return forkJoin(
+    parseVerseNoteElementID(verseNoteElement),
+    parseNotes(verseNoteElement, noteTypes, noteCategories),
+  ).pipe(
+    map(([id, notes]) => {
+      return new VerseNote(id, notes);
+    }),
+  );
 }
 export function verseNoteProcessor(
   document: Document,
@@ -80,5 +123,6 @@ export function verseNoteProcessor(
     map(verseNoteElement => {
       return parseVerseNote(verseNoteElement, noteTypes, noteCategories);
     }),
+    flatMap$,
   );
 }

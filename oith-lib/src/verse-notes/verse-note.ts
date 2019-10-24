@@ -21,15 +21,26 @@ export class NoteRef {
   }
 }
 
-export default class Note extends Doc {
-  public id: string;
+export default class Note {
   public _rev?: string;
-  public docType = DocType.NOTE;
+  public id: string;
   public formatTag: FormatTagHighlight;
   public href?: string;
-  public notePhrase?: string;
+  public notePhrase: string;
   public noteRefs: NoteRef[];
   public noteType: number;
+
+  public constructor(
+    vid: string,
+    noteRefs: NoteRef[],
+    noteType: number,
+    notePhrase: string,
+  ) {
+    this.id = vid;
+    this.notePhrase = notePhrase;
+    this.noteRefs = noteRefs;
+    this.noteType = noteType;
+  }
 }
 
 export class VerseNoteGroup {
