@@ -1,4 +1,11 @@
-import { map, filter, flatMap, toArray, bufferCount } from 'rxjs/operators';
+import {
+  map,
+  filter,
+  flatMap,
+  toArray,
+  bufferCount,
+  retry,
+} from 'rxjs/operators';
 import { readFile$, writeFile$ } from './fs$';
 import { JSDOM } from 'jsdom';
 import { fastGlob$, unzipPath, flatMap$, sortPath } from './main';
@@ -10,6 +17,7 @@ import {
 } from './verse-notes/settings/note-gorup-settings';
 import { verseNoteProcessor } from './processors/verseNoteProcessor';
 import cuid = require('cuid');
+import { parseDocID } from './processors/parseDocID';
 
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
@@ -34,10 +42,12 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
         case 'chapter':
         case 'figure':
         case 'section':
-        case 'book':
+        // case 'book':
         case 'topic': {
+          return parseDocID(d);
           break;
         }
+        case 'book':
         case 'manifest': {
           break;
         }
