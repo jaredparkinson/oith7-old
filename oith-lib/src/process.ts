@@ -1,25 +1,15 @@
-import {
-  map,
-  filter,
-  flatMap,
-  toArray,
-  bufferCount,
-  retry,
-} from 'rxjs/operators';
-import { readFile$, writeFile$ } from './fs$';
-import { JSDOM } from 'jsdom';
-import { fastGlob$, unzipPath, flatMap$, sortPath } from './main';
-import { forkJoin, of, EMPTY, Observable } from 'rxjs';
-import {
-  NoteGroupSettings,
-  NoteTypes,
-  NoteCategories,
-} from './verse-notes/settings/note-gorup-settings';
-import { verseNoteProcessor } from './processors/verseNoteProcessor';
-import cuid = require('cuid');
-import { parseDocID } from './processors/parseDocID';
-import { chapterProcessor } from './processors/chapterProcessor';
 import cheerio from 'cheerio';
+import { EMPTY, forkJoin, Observable, of } from 'rxjs';
+import { bufferCount, filter, flatMap, map, toArray } from 'rxjs/operators';
+import { readFile$, writeFile$ } from './fs$';
+import { fastGlob$, flatMap$, sortPath, unzipPath } from './main';
+import { chapterProcessor } from './processors/chapterProcessor';
+import { verseNoteProcessor } from './processors/verseNoteProcessor';
+import {
+  NoteCategories,
+  NoteTypes,
+} from './verse-notes/settings/note-gorup-settings';
+import cuid = require('cuid');
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
 );
@@ -33,17 +23,7 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
     map(d => forkJoin(of(d), getFileType(d))),
     flatMap(o => o),
     map(([d, t]) => {
-      d;
-
       switch (t) {
-        // case 'chapter':
-        // case 'figure':
-        // case 'title-page':
-        // case 'back-cover':
-        // case 'section':
-        // // case 'book':
-        // case 'topic': {
-        // }
         case 'book':
         case 'manifest': {
           break;
@@ -53,12 +33,10 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
           break;
         }
         default: {
-          // const ti = d('title');
-          // console.log(t);
-          // console.log(ti.text()); // ? ti.innerHTML : '');
-
-          return chapterProcessor(d).pipe(flatMap$);
-          // console.log(t);
+          return chapterProcessor(d).pipe(
+            flatMap$,
+            flatMap(o => o),
+          );
 
           return EMPTY;
         }
@@ -70,7 +48,6 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
     map(o => writeFile$(`${sortPath}/${cuid()}.json`, JSON.stringify(o))),
     toArray(),
   );
-  // .pipe(toArray());
 }
 function loadFiles() {
   return fastGlob$(unzipPath).pipe(
@@ -78,18 +55,6 @@ function loadFiles() {
     map(o =>
       readFile$(o).pipe(
         map(file => {
-          // const s =
-          // const t = s('.page-break');
-          // const st = s('html').attr('data-uri');
-          // if (t.html() !== null && st.trim() !== '') {
-          // console.log(st);
-          // console.log(t.html());
-          // }
-          //
-          // return new JSDOM(file, {
-          // contentType:
-          // o.split('.').pop() === 'html' ? 'text/html' : 'text/xml',
-          // }).window.document;
           return cheerio.load(file, { xmlMode: true, decodeEntities: false });
         }),
       ),
