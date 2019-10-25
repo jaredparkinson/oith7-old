@@ -7,18 +7,25 @@ import { flatMap$ } from '../main';
 import { flatMap, map, find, toArray, filter } from 'rxjs/operators';
 import Note, { NoteRef, VerseNote } from '../verse-notes/verse-note';
 
-function parseVerseNoteElementID(element: CheerioElement) {
+function parseVerseNoteElementID($: CheerioStatic, element: CheerioElement) {
   if (element.attribs['id'] === '') {
     console.log('throw 1');
     throw element.data;
   }
-  return of(element.attribs['id']);
+  return of($(element).attr('id'));
 }
 
-function parseNoteType(noteElement: CheerioElement, noteTypes: NoteTypes) {
+function parseNoteType(
+  $: CheerioStatic,
+  noteElement: CheerioElement,
+  noteTypes: NoteTypes,
+) {
+  // console.log(
+  // noteTypes.noteTypes.find(o => o.className === $(noteElement).attr('class')),
+  // );
   return of(noteTypes.noteTypes).pipe(
     flatMap$,
-    find(o => o.className === noteElement.attribs['class']),
+    find(o => o.className === $(noteElement).attr('class')),
     map(o => (o ? o.noteType : -1)),
   );
 }
@@ -80,7 +87,7 @@ function parseNoteMap(
 ) {
   return forkJoin(
     parseNotePhrase($, noteElement),
-    parseNoteType(noteElement, noteTypes),
+    parseNoteType($, noteElement, noteTypes),
     of($('.note-reference', noteElement)).pipe(
       flatMap(o => o),
       map(nre => {
@@ -123,7 +130,7 @@ function parseVerseNote(
   noteCategories: NoteCategories,
 ) {
   return forkJoin(
-    parseVerseNoteElementID(verseNoteElement),
+    parseVerseNoteElementID($, verseNoteElement),
     parseNotes($, verseNoteElement, noteTypes, noteCategories).pipe(
       filter(o => o.length > 0),
     ),

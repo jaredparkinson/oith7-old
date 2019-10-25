@@ -36,13 +36,14 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
       d;
 
       switch (t) {
-        case 'chapter':
-        case 'figure':
-        case 'section':
-        // case 'book':
-        case 'topic': {
-          return chapterProcessor(d).pipe(flatMap$);
-        }
+        // case 'chapter':
+        // case 'figure':
+        // case 'title-page':
+        // case 'back-cover':
+        // case 'section':
+        // // case 'book':
+        // case 'topic': {
+        // }
         case 'book':
         case 'manifest': {
           break;
@@ -52,10 +53,11 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
           break;
         }
         default: {
-          const ti = d('title');
-          console.log(t);
-          console.log(ti.text()); // ? ti.innerHTML : '');
+          // const ti = d('title');
+          // console.log(t);
+          // console.log(ti.text()); // ? ti.innerHTML : '');
 
+          return chapterProcessor(d).pipe(flatMap$);
           // console.log(t);
 
           return EMPTY;
