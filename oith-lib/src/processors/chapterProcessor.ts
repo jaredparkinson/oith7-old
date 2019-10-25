@@ -2,7 +2,7 @@ import { forkJoin, EMPTY, of } from 'rxjs';
 import { parseDocID } from './parseDocID';
 import { map, flatMap, toArray } from 'rxjs/operators';
 import { flatMap$ } from '../rx/flatMap$';
-import { Verse } from './Chapter';
+import { Verse, Chapter } from './Chapter';
 
 export const fixLink = map((i: Cheerio) => {
   const output = i.attr('href');
@@ -120,6 +120,7 @@ function parseVerses($: CheerioStatic, chapID: string) {
     flatMap$,
     map(o => parseVerse($(o), chapID)),
     flatMap$,
+    toArray(),
   );
 }
 
@@ -139,11 +140,12 @@ export function chapterProcessor($: CheerioStatic) {
       i;
       return forkJoin(parseVerses($, id)).pipe(
         map(([verses]) => {
-          verses;
+          console.log(verses.length);
 
-          console.log($('[href]').attr('href'));
+          return new Chapter(id, '', '', '', '', verses);
+          // console.log($('[href]').attr('href'));
 
-          return EMPTY;
+          // return EMPTY;
         }),
       );
     }),

@@ -35,7 +35,7 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
         default: {
           return chapterProcessor(d).pipe(
             flatMap$,
-            flatMap(o => o),
+            // flatMap(o => o),
           );
 
           return EMPTY;
