@@ -9,7 +9,7 @@ import {
 import { readFile$, writeFile$ } from './fs$';
 import { JSDOM } from 'jsdom';
 import { fastGlob$, unzipPath, flatMap$, sortPath } from './main';
-import { forkJoin, of, EMPTY } from 'rxjs';
+import { forkJoin, of, EMPTY, Observable } from 'rxjs';
 import {
   NoteGroupSettings,
   NoteTypes,
@@ -19,17 +19,13 @@ import { verseNoteProcessor } from './processors/verseNoteProcessor';
 import cuid = require('cuid');
 import { parseDocID } from './processors/parseDocID';
 import { chapterProcessor } from './processors/chapterProcessor';
-
+import cheerio from 'cheerio';
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
 );
 
-export function getFileType(document: Document) {
-  return of(document.querySelector('html') as HTMLHtmlElement).pipe(
-    filterUndefined$,
-    map(e => e.getAttribute('data-content-type') as string),
-    filterUndefined$,
-  );
+export function getFileType(document: CheerioStatic): Observable<string> {
+  return of(document('html').attr('data-content-type'));
 }
 
 export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
@@ -56,10 +52,11 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
           break;
         }
         default: {
-          const ti = d.querySelector('title') as HTMLTitleElement;
-          console.log(ti ? ti.innerHTML : '');
-
+          const ti = d('title');
           console.log(t);
+          console.log(ti.text()); // ? ti.innerHTML : '');
+
+          // console.log(t);
 
           return EMPTY;
         }
@@ -78,13 +75,21 @@ function loadFiles() {
     flatMap$,
     map(o =>
       readFile$(o).pipe(
-        map(
-          file =>
-            new JSDOM(file, {
-              contentType:
-                o.split('.').pop() === 'html' ? 'text/xml' : 'text/xml',
-            }).window.document,
-        ),
+        map(file => {
+          // const s =
+          // const t = s('.page-break');
+          // const st = s('html').attr('data-uri');
+          // if (t.html() !== null && st.trim() !== '') {
+          // console.log(st);
+          // console.log(t.html());
+          // }
+          //
+          // return new JSDOM(file, {
+          // contentType:
+          // o.split('.').pop() === 'html' ? 'text/html' : 'text/xml',
+          // }).window.document;
+          return cheerio.load(file, { xmlMode: true, decodeEntities: false });
+        }),
       ),
     ),
     flatMap$,

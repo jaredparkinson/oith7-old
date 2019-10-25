@@ -7,109 +7,124 @@ import { flatMap$ } from '../main';
 import { flatMap, map, find, toArray, filter } from 'rxjs/operators';
 import Note, { NoteRef, VerseNote } from '../verse-notes/verse-note';
 
-function parseVerseNoteElementID(element: Element) {
-  if (element.id === '') {
+function parseVerseNoteElementID(element: CheerioElement) {
+  if (element.attribs['id'] === '') {
     console.log('throw 1');
-    throw element.innerHTML;
+    throw element.data;
   }
-  return of(element.id);
+  return of(element.attribs['id']);
 }
 
-function parseNoteType(noteElement: Element, noteTypes: NoteTypes) {
+function parseNoteType(noteElement: CheerioElement, noteTypes: NoteTypes) {
   return of(noteTypes.noteTypes).pipe(
     flatMap$,
-    find(o => o.className === noteElement.className),
+    find(o => o.className === noteElement.attribs['class']),
     map(o => (o ? o.noteType : -1)),
   );
 }
 
 function parseNoteCategory(
-  noteRefLabel: Element,
+  $: CheerioStatic,
+  noteRefLabel: Cheerio,
   noteCategories: NoteCategories,
 ) {
   const nc = noteCategories.noteCategories.find(
-    n => n.className === noteRefLabel.className,
+    n => n.className === $(noteRefLabel).attr('class'),
   );
   if (nc) {
-    noteRefLabel.remove();
+    $(noteRefLabel).remove();
+    // noteRefLabel.parent.;
     return of(nc.noteCategory);
   }
-  console.log(`Not valid ${noteRefLabel.outerHTML}`);
+  // console.log(not);
+
+  console.log(`Not valid ${$(noteRefLabel).attr('class')} `);
   return of(-1);
   // throw noteRefLabel.innerHTML;
 }
-function parseNoteRef(noteRefElement: Element, noteCategories: NoteCategories) {
-  const refLabelElement = noteRefElement.querySelector(
-    '[class*="reference-label"]',
-  );
+function parseNoteRef(
+  $: CheerioStatic,
+  noteRefElement: CheerioElement,
+  noteCategories: NoteCategories,
+) {
+  const refLabelElement = $('[class*="reference-label"]', noteRefElement);
   if (refLabelElement) {
-    return parseNoteCategory(refLabelElement, noteCategories).pipe(
+    return parseNoteCategory($, refLabelElement.first(), noteCategories).pipe(
       map(
         (noteCategory): NoteRef => {
-          return new NoteRef(noteCategory, noteRefElement.innerHTML);
+          return new NoteRef(noteCategory, $(noteRefElement).html() as string);
         },
       ),
     );
   }
   console.log('throw 3');
-  throw noteRefElement.innerHTML;
+  throw noteRefElement.data;
 }
 
-function parseNotePhrase(noteE: Element) {
-  const notePhraseElement = noteE.querySelector('.note-phrase');
+function parseNotePhrase($: CheerioStatic, noteE: CheerioElement) {
+  const notePhraseElement = $('.note-phrase', noteE);
 
   if (notePhraseElement) {
-    return of(notePhraseElement.innerHTML);
+    return of($(notePhraseElement).html() as string);
   }
 
   console.log('throw 4');
-  throw noteE.id;
+  throw noteE.attribs['id'];
 }
 
 function parseNoteMap(
-  noteElement: Element,
+  $: CheerioStatic,
+  noteElement: CheerioElement,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
 ) {
   return forkJoin(
-    parseNotePhrase(noteElement),
+    parseNotePhrase($, noteElement),
     parseNoteType(noteElement, noteTypes),
-    of(noteElement.querySelectorAll('.note-reference')).pipe(
+    of($('.note-reference', noteElement)).pipe(
       flatMap(o => o),
       map(nre => {
-        return parseNoteRef(nre, noteCategories);
+        return parseNoteRef($, nre, noteCategories);
       }),
       flatMap$,
       toArray(),
     ),
   ).pipe(
     map(([notePhrase, noteType, noteRefts]) => {
-      return new Note(noteElement.id, noteRefts, noteType, notePhrase);
+      return new Note(
+        noteElement.attribs['id'],
+        noteRefts,
+        noteType,
+        notePhrase,
+      );
     }),
   );
 }
 
 function parseNotes(
-  verseNoteElement: Element,
+  $: CheerioStatic,
+  verseNoteElement: CheerioElement,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
 ) {
-  return of(verseNoteElement.querySelectorAll('note')).pipe(
+  return of($('note', verseNoteElement).toArray()).pipe(
     flatMap(o => o),
-    map(o => parseNoteMap(o, noteTypes, noteCategories)),
+    map(o => parseNoteMap($, o, noteTypes, noteCategories)),
     flatMap$,
     toArray(),
   );
 }
 
 function parseVerseNote(
-  verseNoteElement: Element,
+  $: CheerioStatic,
+
+  verseNoteElement: CheerioElement,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
 ) {
   return forkJoin(
     parseVerseNoteElementID(verseNoteElement),
-    parseNotes(verseNoteElement, noteTypes, noteCategories).pipe(
+    parseNotes($, verseNoteElement, noteTypes, noteCategories).pipe(
       filter(o => o.length > 0),
     ),
   ).pipe(
@@ -119,17 +134,22 @@ function parseVerseNote(
   );
 }
 export function verseNoteProcessor(
-  document: Document,
+  document: CheerioStatic,
   noteTypes: NoteTypes,
   noteCategories: NoteCategories,
 ) {
   document;
   noteTypes;
   noteCategories;
-  return of(document.querySelectorAll('verse-notes')).pipe(
+  return of(document('verse-notes').toArray()).pipe(
     flatMap(o => o),
     map(verseNoteElement => {
-      return parseVerseNote(verseNoteElement, noteTypes, noteCategories);
+      return parseVerseNote(
+        document,
+        verseNoteElement,
+        noteTypes,
+        noteCategories,
+      );
     }),
     flatMap$,
   );

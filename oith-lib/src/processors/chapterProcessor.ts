@@ -32,11 +32,11 @@ export class Chapter {
   }
 }
 
-export function chapterProcessor(document: Document) {
-  const header = document.querySelector('header');
-  if (header && header.querySelector('.page-break') !== null) {
-    console.log(header.innerHTML);
-  }
+export function chapterProcessor(document: CheerioStatic) {
+  const header = document('header');
+  // if (header && header.querySelector('.page-break') !== null) {
+  // console.log(header.innerHTML);
+  // }
   return forkJoin(parseDocID(document)).pipe(
     map(([id]) => {
       id;
