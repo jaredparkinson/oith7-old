@@ -37,8 +37,6 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
             flatMap$,
             // flatMap(o => o),
           );
-
-          return EMPTY;
         }
       }
       return EMPTY;

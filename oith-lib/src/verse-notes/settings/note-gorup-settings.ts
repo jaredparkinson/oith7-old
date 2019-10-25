@@ -30,18 +30,18 @@ export class TruthSetting {
 
 export class NoteCategories {
   // tslint:disable:variable-name
-  public _id: string;
+  public id: string;
   public _rev?: string | undefined;
   public noteCategories: NoteCategory[];
   public truthSettings?: TruthSetting[];
   public visibilitySettings: NoteCategorySetting[][];
 
   public constructor(
-    _id: string,
+    id: string,
     noteCategories: NoteCategory[],
     visibilitySettings: NoteCategorySetting[][],
   ) {
-    this._id = _id;
+    this.id = id;
     this.noteCategories = noteCategories;
     this.visibilitySettings = visibilitySettings;
   }
@@ -94,11 +94,11 @@ export class NoteType {
 }
 
 export class NoteTypes {
-  public _id: string;
+  public id: string;
   public _rev?: string;
   public noteTypes: NoteType[];
-  public constructor(_id: string, noteTypes: NoteType[]) {
-    this._id = _id;
+  public constructor(id: string, noteTypes: NoteType[]) {
+    this.id = id;
     this.noteTypes = noteTypes;
   }
 

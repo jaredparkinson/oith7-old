@@ -1,4 +1,4 @@
-import { VerseNote } from '../verse-notes/verse-note';
+import { VerseNote, Offsets } from '../verse-notes/verse-note';
 export class Verse {
   public id: string;
   public text: string;
@@ -8,8 +8,24 @@ export class Verse {
     this.text = text;
   }
 }
+
+export class FormatText implements Offsets {
+  public id: string;
+  public offsets?: string | undefined;
+  public uncompressedOffsets?: number[] | undefined;
+
+  // public off
+}
+export class FormatGroup {
+  public formatGroup?: FormatGroup[];
+  public classList: string[];
+  public formatText?: FormatText[];
+  public verseIDs?: string[];
+  public verses?: Verse[];
+}
+
 export class Chapter {
-  public _id: string;
+  public id: string;
   public _rev?: string | undefined;
   // public chapterVerseBreaks?: ChapterVerseBreaks;
   // public docType = DocTypes.chapter;
@@ -17,24 +33,27 @@ export class Chapter {
   public shortTitle: string;
   public testament: string;
   public title: string;
+  public body: FormatGroup;
+
   // public versesFormatGroups:
   public verseNotes?: VerseNote[];
   public verses: Verse[];
-  1;
   // public verses: Verse[];
   public constructor(
-    _id: string,
+    id: string,
     lang: string,
     title: string,
     shortTitle: string,
     testament: string,
     verses: Verse[],
+    body: FormatGroup,
   ) {
-    this._id = _id;
+    this.id = id;
     this.lang = lang;
     this.title = title;
     this.shortTitle = shortTitle;
     this.testament = testament;
     this.verses = verses;
+    this.body = body;
   }
 }

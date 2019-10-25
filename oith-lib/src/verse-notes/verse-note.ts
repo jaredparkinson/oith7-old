@@ -434,7 +434,7 @@ export class FormatTagHighlight extends Formating {
   }
 }
 export class FormatTag extends Formating {
-  public _id?: string;
+  public id?: string;
   public pronunciation?: boolean;
   public constructor(
     formatType: FormatTagType,
@@ -447,20 +447,20 @@ export class FormatTag extends Formating {
 }
 
 export class FormatTagNoteOffsets extends FormatTag {
-  public _id: string;
+  public id: string;
   public formatType = FormatTagType.NOTEOFFSETS;
   public highlight?: boolean;
   public noteGroupID: string;
   public uncompressedOffsets: number[];
   public constructor(
     offsets: string,
-    _id: string,
+    id: string,
     noteGroupID: string,
     formatType?: FormatTagType,
   ) {
     super(FormatTagType.NOTEOFFSETS, offsets);
     this.noteGroupID = noteGroupID;
-    this._id = _id;
+    this.id = id;
     if (formatType) {
       this.formatType = formatType;
     }
@@ -479,7 +479,7 @@ export class FormatTagNotePronunciation extends FormatTagNoteOffsets {
   ) {
     super(offsets, _id, offsets, FormatTagType.NOTEOFFSETSPRONUNCIATION);
     this.noteGroupID = noteGroupID;
-    this._id = _id;
+    this.id = _id;
     const note = notes.find(note => note.href !== undefined);
     if (note) {
       this.href = note.href;
@@ -508,7 +508,7 @@ export interface FirstLast {
 }
 
 export class Offsets implements Offset {
-  public _id: string;
+  public id: string;
   public offsets?: string;
   public uncompressedOffsets?: number[];
 }
