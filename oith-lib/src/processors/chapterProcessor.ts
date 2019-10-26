@@ -100,6 +100,38 @@ function parseText(e: Cheerio) {
   return of(e.text());
 }
 
+function parseVerseFormat(
+  $: CheerioStatic,
+  verseE: Cheerio,
+): Observable<string[]> {
+  const isTextNode =
+    $(verseE)
+      .children()
+      .toArray().length === 0;
+
+  const b = $(verseE).text().length;
+
+  if (isTextNode) {
+    console.log(
+      $(verseE)
+        .parent()
+        .html(),
+    );
+  }
+  return of(
+    $(verseE)
+      .children()
+      .toArray(),
+  ).pipe(
+    flatMap$,
+    map(i => forkJoin(of([$(i).prop('nodeName')]), parseVerseFormat($, $(i)))),
+    flatMap(o => o),
+    flatMap(o => o),
+    flatMap$,
+    toArray(),
+  );
+}
+
 function parseVerseID(cID: string, vID: string) {
   const id = /^(p)([0-9]*)/g.exec(vID);
   return `${cID}-${id ? id[2] : vID}-verse`;
@@ -109,10 +141,16 @@ function parseID(e: Cheerio, chapID: string) {
   return of(parseVerseID(chapID, e.prop('id')));
 }
 
-function parseVerse(verseE: Cheerio, chapID: string) {
-  return forkJoin(parseID(verseE, chapID), parseText(verseE)).pipe(
+function parseVerse($: CheerioStatic, verseE: Cheerio, chapID: string) {
+  return forkJoin(
+    parseID(verseE, chapID),
+    parseText(verseE),
+    parseVerseFormat($, verseE).pipe(toArray()),
+  ).pipe(
     map(
-      ([id, text]): Verse => {
+      ([id, text, tgs]): Verse => {
+        console.log(tgs);
+
         return new Verse(id, text);
       },
     ),
@@ -122,7 +160,7 @@ function parseVerse(verseE: Cheerio, chapID: string) {
 function parseVerses($: CheerioStatic, chapID: string) {
   return of($('body [data-aid]').toArray()).pipe(
     flatMap$,
-    map(o => parseVerse($(o), chapID)),
+    map(o => parseVerse($, $(o), chapID)),
     flatMap$,
     toArray(),
   );
@@ -209,8 +247,9 @@ function parseBody($: CheerioStatic, cid: string) {
 
 export function chapterProcessor($: CheerioStatic) {
   const header = $('header');
-  return parseDocID($).pipe(
-    map(id => {
+  return forkJoin(parseDocID($), of($('footer.study-notes').remove())).pipe(
+    map(([id, remove]) => {
+      remove;
       return forkJoin(of(id), fixLinks($), parseBody($, id));
     }),
     flatMap$,
