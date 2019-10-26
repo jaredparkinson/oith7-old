@@ -133,26 +133,29 @@ function fixLinks($: CheerioStatic) {
   );
 }
 
-function parseChildren($: CheerioStatic, element: Cheerio) {
-  // const classList = element.attr('class');
-  // if (classList) {
-  //   console.log(classList);
-  // }
-  return element
-    .children()
-    .toArray()
-    .filter(e => typeof $(e).prop('[data-aid]') === 'undefined')
-    .map(
-      (e): FormatGroup => {
-        const formatGroups = parseChildren($, $(e));
-
-        const nodeName = $(e).prop('nodeName') as string;
-
-        const verseIDS = $(e)
+function parseChildren$(
+  $: CheerioStatic,
+  element: Cheerio,
+): Observable<FormatGroup[]> {
+  return of(element.children().toArray()).pipe(
+    flatMap$,
+    filter(o => typeof $(o).prop('data-aid') === 'undefined'),
+    map(o => {
+      return forkJoin(
+        parseChildren$($, $(o)),
+        of($(o)
           .children()
-          .filter('[data-aid]')
+          // .filter('[data-aid]')
           .toArray()
-          .map(o => $(o).prop('id')) as string[];
+          .filter(e => typeof $(e).prop('data-aid') === 'string')
+          .map(o => $(o).prop('id')) as string[]),
+        of($(o)),
+      );
+    }),
+    flatMap(o => o),
+    map(
+      ([formatGroups, verseIDS, e]): FormatGroup => {
+        const nodeName = $(e).prop('nodeName') as string;
 
         return {
           classList: [nodeName],
@@ -162,7 +165,51 @@ function parseChildren($: CheerioStatic, element: Cheerio) {
           verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
         };
       },
-    );
+    ),
+    toArray(),
+  );
+}
+
+function parseChildren($: CheerioStatic, element: Cheerio) {
+  // const classList = element.attr('class');
+  // if (classList) {
+  //   console.log(classList);
+  // }
+
+  // if (typeof element.prop('data-aid') === 'undefined') {
+  // return;
+  // }
+  return (
+    element
+      .children()
+      .toArray()
+      // .filter(e => typeof $(e).prop('data-aid') !== 'undefined')
+      .map(
+        (e): FormatGroup => {
+          const formatGroups = parseChildren($, $(e));
+
+          console.log($(e).prop('data-aid'));
+          const nodeName = $(e).prop('nodeName') as string;
+
+          const verseIDS = $(e)
+            .children()
+            // .filter('[data-aid]')
+            .toArray()
+            .filter(e => typeof $(e).prop('data-aid') === 'string')
+            .map(o => $(o).prop('id')) as string[];
+
+          console.log(verseIDS);
+
+          return {
+            classList: [nodeName],
+            formatGroup: formatGroups,
+            formatText: undefined,
+            verses: undefined,
+            verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
+          };
+        },
+      )
+  );
 
   // forkJoin(of(element.attr('id')));
   // return of(element.children().toArray()).pipe(
@@ -175,30 +222,59 @@ function parseChildren($: CheerioStatic, element: Cheerio) {
 }
 
 function parseBody($: CheerioStatic) {
+  return forkJoin(
+    parseChildren$($, $('body')),
+    of($('body')
+      .children()
+      // .filter('[data-aid]')
+      .toArray()
+      .filter(e => typeof $(e).prop('data-aid') === 'string')
+      .map(o => $(o).prop('id')) as string[]),
+    // of($('bodys')),
+  ).pipe(
+    map(
+      ([formatGroups, vUd]): FormatGroup => {
+        return {
+          classList: [],
+          formatGroup: formatGroups.length > 0 ? formatGroups : undefined,
+          formatText: undefined,
+          verses: undefined,
+          verseIDs: vUd.length > 0 ? vUd : undefined,
+        };
+      },
+    ),
+  );
   return of(
     $('body')
-      .first()
+      // .first()
       .children()
       .toArray(),
   ).pipe(
     flatMap$,
+    filter(o => typeof $(o).prop('data-aid') === 'undefined'),
+    map(o => {
+      return forkJoin(
+        parseChildren$($, $(o)),
+        of($(o)
+          .children()
+          // .filter('[data-aid]')
+          .toArray()
+          .filter(e => typeof $(e).prop('data-aid') === 'string')
+          .map(o => $(o).prop('id')) as string[]),
+        of($(o)),
+      );
+    }),
+    flatMap(o => o),
     map(
-      (o): FormatGroup => {
-        const formatGroups = parseChildren($, $(o));
-        // const verse = $(o)
-        //   .children()
-        //   .filter('[data-aid]')
-        //   .toArray();
-        // if (verse.length > 0) {
-        //   console.log($(o).prop('class'));
-        // }
+      ([formatGroups, verseIDS, e]): FormatGroup => {
+        const nodeName = $(e).prop('nodeName') as string;
 
         return {
-          classList: [],
+          classList: [nodeName],
           formatGroup: formatGroups,
           formatText: undefined,
           verses: undefined,
-          verseIDs: undefined,
+          verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
         };
       },
     ),
@@ -207,7 +283,7 @@ function parseBody($: CheerioStatic) {
       (o): FormatGroup => {
         return {
           classList: [],
-          formatGroup: o,
+          formatGroup: o.length > 0 ? o : undefined,
           formatText: undefined,
           verses: undefined,
           verseIDs: undefined,
