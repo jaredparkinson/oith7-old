@@ -2,7 +2,7 @@ import { forkJoin, EMPTY, of, Observable } from 'rxjs';
 import { parseDocID } from './parseDocID';
 import { map, flatMap, toArray, filter, retry } from 'rxjs/operators';
 import { flatMap$ } from '../rx/flatMap$';
-import { Verse, Chapter, FormatGroup } from './Chapter';
+import { Verse, Chapter, FormatGroup, FormatText } from './Chapter';
 
 export const fixLink = map((i: Cheerio) => {
   const output = i.attr('href');
@@ -103,6 +103,7 @@ function parseText(e: Cheerio) {
 function parseVerseFormat(
   $: CheerioStatic,
   verseE: Cheerio,
+  count: { count: number },
 ): Observable<string[]> {
   const isTextNode =
     $(verseE)
@@ -112,11 +113,20 @@ function parseVerseFormat(
   const b = $(verseE).text().length;
 
   if (isTextNode) {
-    console.log(
-      $(verseE)
-        .parent()
-        .html(),
-    );
+    const offsets = [count.count, count.count + b];
+    let ft: FormatText;
+    if (offsets[0] === offsets[1]) {
+      ft = { id: '', offsets: count.count.toString() }; // = new FormatText()
+    } else {
+      ft = {
+        id: '',
+        offsets: `${count.count}-${count.count + b - 1}`,
+      }; // = new FormatText()\\
+
+      count.count = count.count + b;
+    }
+    console.log(ft);
+  } else {
   }
   return of(
     $(verseE)
@@ -124,7 +134,9 @@ function parseVerseFormat(
       .toArray(),
   ).pipe(
     flatMap$,
-    map(i => forkJoin(of([$(i).prop('nodeName')]), parseVerseFormat($, $(i)))),
+    map(i =>
+      forkJoin(of([$(i).prop('nodeName')]), parseVerseFormat($, $(i), count)),
+    ),
     flatMap(o => o),
     flatMap(o => o),
     flatMap$,
@@ -145,7 +157,7 @@ function parseVerse($: CheerioStatic, verseE: Cheerio, chapID: string) {
   return forkJoin(
     parseID(verseE, chapID),
     parseText(verseE),
-    parseVerseFormat($, verseE).pipe(toArray()),
+    parseVerseFormat($, verseE, { count: 0 }).pipe(toArray()),
   ).pipe(
     map(
       ([id, text, tgs]): Verse => {
