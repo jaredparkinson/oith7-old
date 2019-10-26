@@ -9,7 +9,7 @@ import {
   distinctUntilChanged,
   filter,
 } from 'rxjs/operators';
-import { flatMap$ } from '../main';
+import { flatMap$ } from '../rx/flatMap$';
 export function expandOffsets(offsets: Offset): Observable<number[]> {
   return of(offsets.offsets as string).pipe(
     filterUndefinedNull$,

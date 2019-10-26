@@ -1,6 +1,6 @@
-import cuid = require('cuid');
+import cuid from 'cuid';
 import { expandOffsets } from '../offsets/expandOffsets';
-import { NoteCategory } from './settings/note-gorup-settings';
+// import { NoteCategory } from './settings/note-gorup-settings';
 
 export const enum DocType {
   VERSENOTE,
