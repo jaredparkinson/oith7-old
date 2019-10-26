@@ -1,8 +1,8 @@
 import { forkJoin, EMPTY, of, Observable } from 'rxjs';
-import { parseDocID } from './parseDocID';
+import { parseDocID } from '../parseDocID';
 import { map, flatMap, toArray, filter, retry } from 'rxjs/operators';
-import { flatMap$ } from '../rx/flatMap$';
-import { Verse, Chapter, FormatGroup, FormatText } from './Chapter';
+import { flatMap$ } from '../../rx/flatMap$';
+import { Verse, Chapter, FormatGroup, FormatText } from '../Chapter';
 
 export const fixLink = map((i: Cheerio) => {
   const output = i.attr('href');
@@ -148,9 +148,9 @@ function parseVerseFormat(
           const isFGrp = Array.isArray(ft);
           return {
             attrs: $(e).attr(),
-            classList: [],
-            formatGroup: isFGrp ? (ft as FormatGroup[]) : undefined,
-            formatText: !isFGrp ? (ft as FormatText) : undefined,
+            cls: [],
+            grps: isFGrp ? (ft as FormatGroup[]) : undefined,
+            txt: !isFGrp ? (ft as FormatText) : undefined,
             verseIDs: undefined,
             verses: undefined,
           };
@@ -230,11 +230,13 @@ function parseChildren$(
       ([formatGroups, verseIDS, e]): FormatGroup => {
         const nodeName = $(e).prop('nodeName') as string;
         const cls = $(e).prop('class');
+        const f = $(e).attr();
+        console.log(Object.keys(f).length);
 
         return {
-          classList: [nodeName].concat(cls ? (cls as string).split(' ') : []),
-          formatGroup: formatGroups.length > 0 ? formatGroups : undefined,
-          formatText: undefined,
+          cls: [nodeName].concat(cls ? (cls as string).split(' ') : []),
+          grps: formatGroups.length > 0 ? formatGroups : undefined,
+          txt: undefined,
           verses: undefined,
           verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
           attrs: $(e).attr(),
@@ -261,9 +263,9 @@ function parseBody($: CheerioStatic, cid: string) {
     map(
       ([formatGroups, vUd]): FormatGroup => {
         return {
-          classList: ['body'],
-          formatGroup: formatGroups.length > 0 ? formatGroups : undefined,
-          formatText: undefined,
+          cls: ['body'],
+          grps: formatGroups.length > 0 ? formatGroups : undefined,
+          txt: undefined,
           verses: undefined,
           verseIDs: vUd.length > 0 ? vUd : undefined,
         };

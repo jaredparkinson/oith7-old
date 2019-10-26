@@ -3,7 +3,7 @@ import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { bufferCount, filter, flatMap, map, toArray } from 'rxjs/operators';
 import { readFile$, writeFile$ } from './fs$';
 import { fastGlob$, flatMap$, sortPath, unzipPath } from './main';
-import { chapterProcessor } from './processors/chapterProcessor';
+import { chapterProcessor } from './processors/ChapterProcessor/chapterProcessor';
 import { verseNoteProcessor } from './processors/verseNoteProcessor';
 import {
   NoteCategories,
@@ -42,7 +42,7 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
       return EMPTY;
     }),
     flatMap(o => o),
-    bufferCount(100),
+    bufferCount(1),
     map(o => writeFile$(`${sortPath}/${cuid()}.json`, JSON.stringify(o))),
     toArray(),
   );

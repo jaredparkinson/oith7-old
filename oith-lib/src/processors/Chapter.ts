@@ -19,9 +19,9 @@ export class FormatText implements Offsets {
   // public off
 }
 export class FormatGroup {
-  public formatGroup?: FormatGroup[];
-  public classList: string[];
-  public formatText?: FormatText;
+  public grps?: FormatGroup[];
+  public cls: string[];
+  public txt?: FormatText;
   public verseIDs?: string[];
   public verses?: Verse[];
   public attrs?: {};
