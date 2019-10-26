@@ -231,15 +231,15 @@ function parseChildren$(
         const nodeName = $(e).prop('nodeName') as string;
         const cls = $(e).prop('class');
         const f = $(e).attr();
-        console.log(Object.keys(f).length);
+        const l = Object.keys(f).length;
 
         return {
-          cls: [nodeName].concat(cls ? (cls as string).split(' ') : []),
+          cls: [nodeName], //.concat(cls ? (cls as string).split(' ') : []),
           grps: formatGroups.length > 0 ? formatGroups : undefined,
           txt: undefined,
           verses: undefined,
           verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
-          attrs: $(e).attr(),
+          attrs: l > 0 ? $(e).attr() : undefined,
         };
       },
     ),
