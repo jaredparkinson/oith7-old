@@ -1,6 +1,6 @@
 import { forkJoin, EMPTY, of, Observable } from 'rxjs';
 import { parseDocID } from './parseDocID';
-import { map, flatMap, toArray, filter } from 'rxjs/operators';
+import { map, flatMap, toArray, filter, retry } from 'rxjs/operators';
 import { flatMap$ } from '../rx/flatMap$';
 import { Verse, Chapter, FormatGroup } from './Chapter';
 
@@ -100,9 +100,13 @@ function parseText(e: Cheerio) {
   return of(e.text());
 }
 
+function parseVerseID(cID: string, vID: string) {
+  const id = /^(p)([0-9]*)/g.exec(vID);
+  return `${cID}-${id ? id[2] : vID}-verse`;
+}
+
 function parseID(e: Cheerio, chapID: string) {
-  const id = /^(p)([0-9]*)/g.exec(e.attr('id'));
-  return of(`${chapID}-${id ? id[2] : e.attr('id')}-verse`);
+  return of(parseVerseID(chapID, e.prop('id')));
 }
 
 function parseVerse(verseE: Cheerio, chapID: string) {
@@ -136,19 +140,23 @@ function fixLinks($: CheerioStatic) {
 function parseChildren$(
   $: CheerioStatic,
   element: Cheerio,
+  cid: string,
 ): Observable<FormatGroup[]> {
   return of(element.children().toArray()).pipe(
     flatMap$,
     filter(o => typeof $(o).prop('data-aid') === 'undefined'),
     map(o => {
       return forkJoin(
-        parseChildren$($, $(o)),
+        parseChildren$($, $(o), cid),
         of($(o)
           .children()
-          // .filter('[data-aid]')
           .toArray()
           .filter(e => typeof $(e).prop('data-aid') === 'string')
-          .map(o => $(o).prop('id')) as string[]),
+          .map(o => $(o).prop('id')) as string[]).pipe(
+          flatMap$,
+          map(id => parseVerseID(cid, id)),
+          toArray(),
+        ),
         of($(o)),
       );
     }),
@@ -156,13 +164,15 @@ function parseChildren$(
     map(
       ([formatGroups, verseIDS, e]): FormatGroup => {
         const nodeName = $(e).prop('nodeName') as string;
+        const cls = $(e).prop('class');
 
         return {
-          classList: [nodeName],
-          formatGroup: formatGroups,
+          classList: [nodeName].concat(cls ? (cls as string).split(' ') : []),
+          formatGroup: formatGroups.length > 0 ? formatGroups : undefined,
           formatText: undefined,
           verses: undefined,
           verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
+          attrs: $(e).attr(),
         };
       },
     ),
@@ -170,72 +180,23 @@ function parseChildren$(
   );
 }
 
-function parseChildren($: CheerioStatic, element: Cheerio) {
-  // const classList = element.attr('class');
-  // if (classList) {
-  //   console.log(classList);
-  // }
-
-  // if (typeof element.prop('data-aid') === 'undefined') {
-  // return;
-  // }
-  return (
-    element
-      .children()
-      .toArray()
-      // .filter(e => typeof $(e).prop('data-aid') !== 'undefined')
-      .map(
-        (e): FormatGroup => {
-          const formatGroups = parseChildren($, $(e));
-
-          console.log($(e).prop('data-aid'));
-          const nodeName = $(e).prop('nodeName') as string;
-
-          const verseIDS = $(e)
-            .children()
-            // .filter('[data-aid]')
-            .toArray()
-            .filter(e => typeof $(e).prop('data-aid') === 'string')
-            .map(o => $(o).prop('id')) as string[];
-
-          console.log(verseIDS);
-
-          return {
-            classList: [nodeName],
-            formatGroup: formatGroups,
-            formatText: undefined,
-            verses: undefined,
-            verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
-          };
-        },
-      )
-  );
-
-  // forkJoin(of(element.attr('id')));
-  // return of(element.children().toArray()).pipe(
-  //   flatMap(o => o),
-  //   filter(o => $(o).attr('data-aid') === ''),
-  //   map(o => parseChildren($, $(o))),
-  //   flatMap(o => o),
-  //   toArray(),
-  // );
-}
-
-function parseBody($: CheerioStatic) {
+function parseBody($: CheerioStatic, cid: string) {
   return forkJoin(
-    parseChildren$($, $('body')),
+    parseChildren$($, $('body'), cid),
     of($('body')
       .children()
-      // .filter('[data-aid]')
       .toArray()
       .filter(e => typeof $(e).prop('data-aid') === 'string')
-      .map(o => $(o).prop('id')) as string[]),
-    // of($('bodys')),
+      .map(o => $(o).prop('id')) as string[]).pipe(
+      flatMap$,
+      map(id => parseVerseID(cid, id)),
+      toArray(),
+    ),
   ).pipe(
     map(
       ([formatGroups, vUd]): FormatGroup => {
         return {
-          classList: [],
+          classList: ['body'],
           formatGroup: formatGroups.length > 0 ? formatGroups : undefined,
           formatText: undefined,
           verses: undefined,
@@ -244,69 +205,21 @@ function parseBody($: CheerioStatic) {
       },
     ),
   );
-  return of(
-    $('body')
-      // .first()
-      .children()
-      .toArray(),
-  ).pipe(
-    flatMap$,
-    filter(o => typeof $(o).prop('data-aid') === 'undefined'),
-    map(o => {
-      return forkJoin(
-        parseChildren$($, $(o)),
-        of($(o)
-          .children()
-          // .filter('[data-aid]')
-          .toArray()
-          .filter(e => typeof $(e).prop('data-aid') === 'string')
-          .map(o => $(o).prop('id')) as string[]),
-        of($(o)),
-      );
-    }),
-    flatMap(o => o),
-    map(
-      ([formatGroups, verseIDS, e]): FormatGroup => {
-        const nodeName = $(e).prop('nodeName') as string;
-
-        return {
-          classList: [nodeName],
-          formatGroup: formatGroups,
-          formatText: undefined,
-          verses: undefined,
-          verseIDs: verseIDS.length > 0 ? verseIDS : undefined,
-        };
-      },
-    ),
-    toArray(),
-    map(
-      (o): FormatGroup => {
-        return {
-          classList: [],
-          formatGroup: o.length > 0 ? o : undefined,
-          formatText: undefined,
-          verses: undefined,
-          verseIDs: undefined,
-        };
-      },
-    ),
-  );
 }
 
 export function chapterProcessor($: CheerioStatic) {
   const header = $('header');
-  return forkJoin(parseDocID($), fixLinks($), parseBody($)).pipe(
+  return parseDocID($).pipe(
+    map(id => {
+      return forkJoin(of(id), fixLinks($), parseBody($, id));
+    }),
+    flatMap$,
     map(([id, i, body]) => {
       body;
       i;
       return forkJoin(parseVerses($, id)).pipe(
         map(([verses]) => {
-          // console.log(verses.length);
-
           return new Chapter(id, '', '', '', '', verses, body);
-          // console.log($('[href]').attr('href'));
-
-          // return EMPTY;
         }),
       );
     }),

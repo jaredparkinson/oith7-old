@@ -22,6 +22,7 @@ export class FormatGroup {
   public formatText?: FormatText[];
   public verseIDs?: string[];
   public verses?: Verse[];
+  public attrs?: {};
 }
 
 export class Chapter {
