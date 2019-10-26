@@ -10,6 +10,7 @@ import {
   NoteTypes,
 } from './verse-notes/settings/note-gorup-settings';
 import cuid = require('cuid');
+import { sort } from './processors/sort';
 export const filterUndefined$ = filter(
   <T>(o: T) => o !== undefined && o !== null,
 );
@@ -19,33 +20,39 @@ export function getFileType(document: CheerioStatic): Observable<string> {
 }
 
 export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
-  return loadFiles().pipe(
-    map(d => forkJoin(of(d), getFileType(d))),
-    flatMap(o => o),
-    map(([d, t]) => {
-      switch (t) {
-        case 'book':
-        case 'manifest': {
-          break;
+  return loadFiles()
+    .pipe(
+      map(d => forkJoin(of(d), getFileType(d))),
+      flatMap(o => o),
+      map(([d, t]) => {
+        switch (t) {
+          case 'book':
+          case 'manifest': {
+            break;
+          }
+          case 'overlay-note': {
+            return verseNoteProcessor(d, noteTypes, noteCategories);
+            break;
+          }
+          default: {
+            return chapterProcessor(d).pipe(
+              flatMap$,
+              // flatMap(o => o),
+            );
+          }
         }
-        case 'overlay-note': {
-          return verseNoteProcessor(d, noteTypes, noteCategories);
-          break;
-        }
-        default: {
-          return chapterProcessor(d).pipe(
-            flatMap$,
-            // flatMap(o => o),
-          );
-        }
-      }
-      return EMPTY;
-    }),
-    flatMap(o => o),
-    bufferCount(1),
-    map(o => writeFile$(`${sortPath}/${cuid()}.json`, JSON.stringify(o))),
-    toArray(),
-  );
+        return EMPTY;
+      }),
+      flatMap(o => o),
+      toArray(),
+      map(o => sort(o)),
+      flatMap(o => o),
+      map(o => writeFile$(`${sortPath}/${o.id}.json`, JSON.stringify(o))),
+    )
+    .pipe(
+      flatMap(o => o),
+      toArray(),
+    );
 }
 function loadFiles() {
   return fastGlob$(unzipPath).pipe(

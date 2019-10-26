@@ -305,7 +305,7 @@ export function chapterProcessor($: CheerioStatic) {
       return forkJoin(parseVerses($, id)).pipe(
         map(([verses]) => {
           return new Chapter(
-            id,
+            `${id}-chapter`,
             $('html').prop('lang'),
             t,
             st,
