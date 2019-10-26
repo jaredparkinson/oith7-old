@@ -1,1 +1,5 @@
-<p>chapter works!</p>
+<ng-container *ngIf="this.chapter">
+  <ng-container *ngFor="let b of this.chapter.body.grps">
+    <app-format-group [formatGroup]="b"></app-format-group>
+  </ng-container>
+</ng-container>

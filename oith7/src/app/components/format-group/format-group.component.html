@@ -1,1 +1,22 @@
-<p>format-group works!</p>
+<format-group
+  class="{{ this.cls }}"
+  [attr.nodeName]="this.formatGroup.cls.join(' ')"
+>
+  <ng-container *ngIf="this.formatGroup">
+    <ng-container *ngIf="this.formatGroup.grps">
+      <ng-container *ngFor="let grp of this.formatGroup.grps">
+        <!-- <ng-container *ngIf="grp.attrs">{{ grp.attrs }}</ng-container> -->
+
+        <app-format-group [formatGroup]="grp"></app-format-group>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngIf="this.formatGroup.txt">
+    <ng-container *ngFor="let txt of this.formatGroup.txt">
+      <app-format-text [formatText]="txt"></app-format-text>
+    </ng-container>
+  </ng-container>
+
+  Verse IDS
+  {{ this.formatGroup.verseIDs ? this.formatGroup.verseIDs.join('-') : '' }}
+</format-group>
