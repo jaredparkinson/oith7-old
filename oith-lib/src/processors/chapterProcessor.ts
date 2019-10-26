@@ -272,22 +272,50 @@ function parseBody($: CheerioStatic, cid: string) {
   );
 }
 
+function parseTitle($: CheerioStatic) {
+  return of(
+    $('[type=citation]')
+      .first()
+      .text(),
+  );
+}
+
+function parseShortTitle($: CheerioStatic) {
+  return of($('[type*=short-citation]').text());
+}
 export function chapterProcessor($: CheerioStatic) {
   const header = $('header');
-  return forkJoin(parseDocID($), of($('footer.study-notes').remove())).pipe(
+  return prepChapter($).pipe(
     map(([id, remove]) => {
       remove;
-      return forkJoin(of(id), fixLinks($), parseBody($, id));
+      return forkJoin(
+        of(id),
+        fixLinks($),
+        parseBody($, id),
+        parseTitle($),
+        parseShortTitle($),
+      );
     }),
     flatMap$,
-    map(([id, i, body]) => {
+    map(([id, i, body, t, st]) => {
       body;
       i;
       return forkJoin(parseVerses($, id)).pipe(
         map(([verses]) => {
-          return new Chapter(id, '', '', '', '', verses, body);
+          return new Chapter(
+            id,
+            $('html').prop('lang'),
+            t,
+            st,
+            '',
+            verses,
+            body,
+          );
         }),
       );
     }),
   );
+}
+function prepChapter($: CheerioStatic) {
+  return forkJoin(parseDocID($), of($('footer.study-notes').remove()));
 }
