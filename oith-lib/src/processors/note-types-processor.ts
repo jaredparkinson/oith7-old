@@ -32,8 +32,8 @@ const parseNoteCategoryMap = map((noteCategoryElement: Element) => {
 
 export function noteTypeProcessor(docuemnt: Document) {
   return forkJoin(
-    parseLanguage(docuemnt),
-    of(docuemnt.querySelectorAll('note-categories note-category')).pipe(
+    of('eng'),
+    of(docuemnt.querySelectorAll('note-types note-type')).pipe(
       flatMap(o => o),
       parseNoteCategoryMap,
       flatMap$,

@@ -1,8 +1,8 @@
 import { of } from 'rxjs';
-export function parseLanguage(docuemnt: Document) {
-  const htmlE = docuemnt.querySelector('html');
-  if (htmlE && htmlE.hasAttribute('lang')) {
-    return of(htmlE.getAttribute('lang') as string);
+export function parseLanguage(docuemnt: CheerioStatic) {
+  const htmlE = docuemnt('html');
+  if (htmlE && htmlE.attr('lang') !== '') {
+    return of(htmlE.attr('lang') as string);
   }
   throw new Error('No valid lang found');
 }
