@@ -104,7 +104,7 @@ function parseVerseFormat(
   $: CheerioStatic,
   verseE: Cheerio,
   count: { count: number },
-): Observable<string[]> {
+): Observable<FormatGroup[] | FormatText> {
   const isTextNode =
     $(verseE)
       .children()
@@ -116,32 +116,49 @@ function parseVerseFormat(
     const offsets = [count.count, count.count + b];
     let ft: FormatText;
     if (offsets[0] === offsets[1]) {
-      ft = { id: '', offsets: count.count.toString() }; // = new FormatText()
+      ft = {
+        id: '',
+        offsets: '',
+        uncompressedOffsets: undefined,
+      }; // = new FormatText()
     } else {
       ft = {
         id: '',
         offsets: `${count.count}-${count.count + b - 1}`,
+        uncompressedOffsets: undefined,
       }; // = new FormatText()\\
 
       count.count = count.count + b;
     }
-    console.log(ft);
+    // console.log(ft);
+    // console.log(ft instanceof FormatText);
+
+    return of(ft);
   } else {
+    return of(
+      $(verseE)
+        .children()
+        .toArray(),
+    ).pipe(
+      flatMap$,
+      map(i => forkJoin(of($(i)), parseVerseFormat($, $(i), count))),
+      flatMap(o => o),
+      map(
+        ([e, ft]): FormatGroup => {
+          const isFGrp = Array.isArray(ft);
+          return {
+            attrs: $(e).attr(),
+            classList: [],
+            formatGroup: isFGrp ? (ft as FormatGroup[]) : undefined,
+            formatText: !isFGrp ? (ft as FormatText) : undefined,
+            verseIDs: undefined,
+            verses: undefined,
+          };
+        },
+      ),
+      toArray(),
+    );
   }
-  return of(
-    $(verseE)
-      .children()
-      .toArray(),
-  ).pipe(
-    flatMap$,
-    map(i =>
-      forkJoin(of([$(i).prop('nodeName')]), parseVerseFormat($, $(i), count)),
-    ),
-    flatMap(o => o),
-    flatMap(o => o),
-    flatMap$,
-    toArray(),
-  );
 }
 
 function parseVerseID(cID: string, vID: string) {
@@ -157,13 +174,11 @@ function parseVerse($: CheerioStatic, verseE: Cheerio, chapID: string) {
   return forkJoin(
     parseID(verseE, chapID),
     parseText(verseE),
-    parseVerseFormat($, verseE, { count: 0 }).pipe(toArray()),
+    parseVerseFormat($, verseE, { count: 0 }), //.pipe(toArray()),
   ).pipe(
     map(
       ([id, text, tgs]): Verse => {
-        console.log(tgs);
-
-        return new Verse(id, text);
+        return new Verse(id, text, tgs as FormatGroup[]);
       },
     ),
   );

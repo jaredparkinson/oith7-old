@@ -3,9 +3,11 @@ export class Verse {
   public id: string;
   public text: string;
 
-  public constructor(id: string, text: string) {
+  public formatGroups: FormatGroup[];
+  public constructor(id: string, text: string, formatGroups: FormatGroup[]) {
     this.id = id;
     this.text = text;
+    this.formatGroups = formatGroups;
   }
 }
 
@@ -19,7 +21,7 @@ export class FormatText implements Offsets {
 export class FormatGroup {
   public formatGroup?: FormatGroup[];
   public classList: string[];
-  public formatText?: FormatText[];
+  public formatText?: FormatText;
   public verseIDs?: string[];
   public verses?: Verse[];
   public attrs?: {};
