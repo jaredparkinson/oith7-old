@@ -39,6 +39,7 @@ export class Chapter extends Doc {
   public testament: string;
   public title: string;
   public body: FormatGroup;
+  public sortVerseNotes?: VerseNote[];
 
   // public versesFormatGroups:
   public verseNotes?: VerseNote[];

@@ -1,0 +1,5 @@
+<verse-notes *ngIf="this.verseNotes">
+  <ng-container *ngFor="let verseNote of this.verseNotes">
+    <app-verse-note [verseNote]="verseNote"></app-verse-note>
+  </ng-container>
+</verse-notes>

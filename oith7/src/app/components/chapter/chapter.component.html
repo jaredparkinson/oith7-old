@@ -1,5 +1,19 @@
-<ng-container *ngIf="this.chapter">
-  <ng-container *ngFor="let b of this.chapter.body.grps">
-    <app-format-group [formatGroup]="b"></app-format-group>
-  </ng-container>
-</ng-container>
+<oith-chapter-parent
+  style="display: grid; grid-template-columns: 250px auto 300px;"
+  *ngIf="this.chapter"
+>
+  <oith-navigation></oith-navigation>
+  <oith-chapter>
+    <ng-container *ngIf="this.chapter">
+      <ng-container *ngFor="let b of this.chapter.body.grps">
+        <app-format-group [formatGroup]="b"></app-format-group>
+      </ng-container>
+    </ng-container>
+  </oith-chapter>
+  <oith-verse-notes>
+    <app-verse-notes
+      *ngIf="this.chapter.sortVerseNotes"
+      [verseNotes]="this.chapter.sortVerseNotes"
+    ></app-verse-notes>
+  </oith-verse-notes>
+</oith-chapter-parent>

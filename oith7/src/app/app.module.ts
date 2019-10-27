@@ -13,6 +13,11 @@ import { FormatGroupComponent } from './components/format-group/format-group.com
 import { FormatTextComponent } from './components/format-text/format-text.component';
 import { FormatVerseComponent } from './components/format-verse/format-verse.component';
 import { HttpClientModule } from '@angular/common/http';
+import { VerseNotesComponent } from './components/verse-notes/verse-notes.component';
+import { VerseNoteComponent } from './components/verse-note/verse-note.component';
+import { NoteComponent } from './components/note/note.component';
+import { NotePhraseComponent } from './components/note-phrase/note-phrase.component';
+import { NoteRefComponent } from './components/note-ref/note-ref.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +26,12 @@ import { HttpClientModule } from '@angular/common/http';
     ChapterComponent,
     FormatGroupComponent,
     FormatTextComponent,
-    FormatVerseComponent
+    FormatVerseComponent,
+    VerseNotesComponent,
+    VerseNoteComponent,
+    NoteComponent,
+    NotePhraseComponent,
+    NoteRefComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],

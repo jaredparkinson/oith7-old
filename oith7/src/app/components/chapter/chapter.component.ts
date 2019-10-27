@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { filter, map, flatMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Chapter } from '../../../../../oith-lib/src/processors/Chapter';
 
-import { addVersesToBody } from '../../../../../oith-lib/src/shells/build-shells';
+import {
+  addVersesToBody,
+  generateVerseNoteShell
+} from '../../../../../oith-lib/src/shells/build-shells';
+import { flatMap$ } from '../../../../../oith-lib/src/rx/flatMap$';
 @Component({
   selector: 'app-chapter',
   templateUrl: './chapter.component.html',
@@ -30,13 +34,21 @@ export class ChapterComponent implements OnInit {
             { responseType: 'json' }
           )
         ),
+        flatMap(o => o),
+        map(chapter => {
+          this.chapter = chapter as Chapter;
+          console.log(this.chapter.verseNotes);
+
+          return forkJoin(
+            addVersesToBody(this.chapter),
+            generateVerseNoteShell(this.chapter).pipe(
+              map(o => ((this.chapter as Chapter).verseNotes = o))
+            )
+          );
+        }),
         flatMap(o => o)
       )
-      .subscribe((o: Chapter) => {
-        this.chapter = o;
-        addVersesToBody(this.chapter);
-        console.log(this.chapter);
-      });
+      .subscribe(o => {});
     return forkJoin(
       // this.router.events.pipe(filter(o => o instanceof NavigationEnd)),
       this.activatedRoute.params
