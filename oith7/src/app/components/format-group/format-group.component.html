@@ -1,6 +1,6 @@
 <format-group
   class="{{ this.cls }}"
-  [attr.nodeName]="this.formatGroup.cls.join(' ')"
+  [attr.nodeName]="this.formatGroup.cls ? this.formatGroup.cls.join(' ') : ''"
 >
   <ng-container *ngIf="this.formatGroup">
     <ng-container *ngIf="this.formatGroup.grps">
@@ -16,7 +16,25 @@
       <app-format-text [formatText]="txt"></app-format-text>
     </ng-container>
   </ng-container>
-
-  Verse IDS
-  {{ this.formatGroup.verseIDs ? this.formatGroup.verseIDs.join('-') : '' }}
+  <ng-container *ngIf="this.formatGroup.verses">
+    <ng-container *ngFor="let verse of formatGroup.verses">
+      <oith-verse [id]="verse.id"
+        >{{ verse.text }}
+        <ng-container
+          *ngIf="verse.formatGroups && verse.formatGroups.length !== undefined"
+        >
+          <ng-container *ngFor="let grp of verse.formatGroups">
+            <app-format-group [formatGroup]="grp"></app-format-group>
+          </ng-container>
+        </ng-container>
+        <ng-container
+          *ngIf="verse.formatGroups && verse.formatGroups.length === undefined"
+        >
+          <app-format-group
+            [formatGroup]="verse.formatGroups"
+          ></app-format-group>
+        </ng-container>
+      </oith-verse>
+    </ng-container>
+  </ng-container>
 </format-group>

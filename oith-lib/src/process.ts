@@ -2,7 +2,7 @@ import cheerio from 'cheerio';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { bufferCount, filter, flatMap, map, toArray } from 'rxjs/operators';
 import { readFile$, writeFile$ } from './fs$';
-import { fastGlob$, flatMap$, sortPath, unzipPath } from './main';
+import { fastGlob$, flatMap$, sortPath, unzipPath, flatPath } from './main';
 import { chapterProcessor } from './processors/ChapterProcessor/chapterProcessor';
 import { verseNoteProcessor } from './processors/verseNoteProcessor';
 import {
@@ -20,6 +20,8 @@ export function getFileType(document: CheerioStatic): Observable<string> {
 }
 
 export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
+  console.log('Processing Fils');
+
   return loadFiles()
     .pipe(
       map(d => forkJoin(of(d), getFileType(d))),
@@ -44,12 +46,18 @@ export function process(noteTypes: NoteTypes, noteCategories: NoteCategories) {
         return EMPTY;
       }),
       flatMap(o => o),
-      toArray(),
-      map(o => sort(o)),
+      // toArray(),
+      // map(o => sort(o)),
+      // flatMap(o => o),
+      bufferCount(100),
+      map(o => writeFile$(`${sortPath}/${cuid()}.json`, JSON.stringify(o))),
       flatMap(o => o),
-      map(o => writeFile$(`${sortPath}/${o.id}.json`, JSON.stringify(o))),
+      toArray(),
     )
     .pipe(
+      map(() => sort()),
+      flatMap(o => o),
+      map(o => writeFile$(`${flatPath}/${o.id}.json`, JSON.stringify(o))),
       flatMap(o => o),
       toArray(),
     );

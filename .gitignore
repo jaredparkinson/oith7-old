@@ -61,3 +61,4 @@ typings/
 .next
 scripture_files/
 oith-lib/.cache
+oith-lib/report.*.json

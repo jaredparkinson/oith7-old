@@ -50,7 +50,7 @@ export class NoteCategory {
   public className: string;
   public label: string;
   public name: string;
-  public noteCategory: number;
+  public category: number;
   public off?: string[];
   public on: string[];
   public visible?: boolean;
@@ -64,7 +64,7 @@ export class NoteCategory {
     visible?: boolean,
   ) {
     this.visible = visible;
-    this.noteCategory = noteCategory;
+    this.category = noteCategory;
     this.className = className;
     this.name = name;
     this.label = label;

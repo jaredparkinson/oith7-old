@@ -5,40 +5,49 @@ import { expandOffsets } from '../offsets/expandOffsets';
 export const enum DocType {
   VERSENOTE,
   NOTE,
+  CHAPTER,
+  VERSE,
+  FORMATGROUP,
+  FORMATTEXT,
 }
 export class Doc {
   public id: string;
   public docType: DocType;
+  public constructor(id: string, docType: DocType) {
+    this.id = id;
+    this.docType = docType;
+  }
 }
 
 export class NoteRef {
-  public noteCategory?: number;
+  public category?: number;
   public text?: string;
-  public visible?: boolean;
+  public vis?: boolean;
   public constructor(noteC: number, text: string) {
-    this.noteCategory = noteC;
+    this.category = noteC;
     this.text = text;
   }
 }
 
-export default class Note {
+export class Note extends Doc {
   public _rev?: string;
-  public id: string;
+  // public id: string;
   public formatTag: FormatTagHighlight;
   public href?: string;
-  public notePhrase: string;
-  public noteRefs: NoteRef[];
+  public phrase: string;
+  public ref: NoteRef[];
   public noteType: number;
-
+  // public docType: DocType = DocType.NOTE;
   public constructor(
     vid: string,
     noteRefs: NoteRef[],
     noteType: number,
     notePhrase: string,
   ) {
-    this.id = vid;
-    this.notePhrase = notePhrase;
-    this.noteRefs = noteRefs;
+    super(vid, DocType.NOTE);
+    // this.id = vid;
+    this.phrase = notePhrase;
+    this.ref = noteRefs;
     this.noteType = noteType;
   }
 }
@@ -58,7 +67,7 @@ export class VerseNoteGroup {
         ? note.formatTag.offsets
         : '100000';
     this.id = id;
-    this.notePhrase = note.notePhrase ? note.notePhrase : '';
+    this.notePhrase = note.phrase ? note.phrase : '';
     this.notes.push(note);
   }
 }
@@ -66,14 +75,14 @@ export class VerseNoteGroup {
 export class VerseNote extends Doc {
   public id: string;
   public _rev?: string;
-  public docType = DocType.VERSENOTE;
-  public noteGroups?: VerseNoteGroup[];
+  // public docType = DocType.VERSENOTE;
+  public grps?: VerseNoteGroup[];
   public notes?: Note[];
-  public notesProperties?: FormatTagHighlight[];
-  public visible?: boolean;
+  public props?: FormatTagHighlight[];
+  public vis?: boolean;
 
   public constructor(id: string, notes: Note[]) {
-    super();
+    super(id, DocType.VERSENOTE);
     this.id = id;
 
     this.notes = notes;
@@ -412,14 +421,14 @@ export const FORMATTAGTYPESETTINGS: FormatTagTypeSetting[] = [
 ];
 
 export abstract class Formating {
-  public formatType: FormatTagType;
+  public fType: FormatTagType;
   public offsets?: string;
 
   public uncompressedOffsets?: number[];
   public uncompressedOffsets2?: { first: number; last: number }[];
   public visible?: boolean;
   public constructor(formatType: FormatTagType, offsets: string) {
-    this.formatType = formatType;
+    this.fType = formatType;
 
     this.offsets = offsets;
   }
@@ -448,7 +457,7 @@ export class FormatTag extends Formating {
 
 export class FormatTagNoteOffsets extends FormatTag {
   public id: string;
-  public formatType = FormatTagType.NOTEOFFSETS;
+  public fType = FormatTagType.NOTEOFFSETS;
   public highlight?: boolean;
   public noteGroupID: string;
   public uncompressedOffsets: number[];
@@ -462,13 +471,13 @@ export class FormatTagNoteOffsets extends FormatTag {
     this.noteGroupID = noteGroupID;
     this.id = id;
     if (formatType) {
-      this.formatType = formatType;
+      this.fType = formatType;
     }
     expandOffsets(this);
   }
 }
 export class FormatTagNotePronunciation extends FormatTagNoteOffsets {
-  public formatType = FormatTagType.NOTEOFFSETSPRONUNCIATION;
+  public fType = FormatTagType.NOTEOFFSETSPRONUNCIATION;
   public href?: string;
   public underline: boolean;
   public constructor(
@@ -516,6 +525,6 @@ export class Offsets implements Offset {
 export class OffsetGroup {
   // public _id: string;
   // public noteProperities?: NoteProperities;
-  public notePhrase: string;
+  public phrase: string;
   public offsets?: Offsets[];
 }

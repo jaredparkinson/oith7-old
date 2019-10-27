@@ -4,6 +4,8 @@ import { forkJoin } from 'rxjs';
 import { filter, map, flatMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Chapter } from '../../../../../oith-lib/src/processors/Chapter';
+
+import { addVersesToBody } from '../../../../../oith-lib/src/shells/build-shells';
 @Component({
   selector: 'app-chapter',
   templateUrl: './chapter.component.html',
@@ -32,6 +34,7 @@ export class ChapterComponent implements OnInit {
       )
       .subscribe((o: Chapter) => {
         this.chapter = o;
+        addVersesToBody(this.chapter);
         console.log(this.chapter);
       });
     return forkJoin(

@@ -25,8 +25,9 @@ export class ChapterProcessor {
 
 const cache = normalizePath('./.cache');
 export const unzipPath = normalizePath(`${cache}/unzip`);
-export const flatPath = normalizePath(`${cache}/unzip`);
+export const flatPath = normalizePath(`${cache}/flat`);
 export const sortPath = normalizePath(`${cache}/sort`);
+// export const sortPath = normalizePath(`${cache}/sort`);
 
 // const inputFolder = of(argv.i as string);
 
@@ -118,8 +119,6 @@ forkJoin(hasArg('ns', 'string'), hasArg('i', 'string'))
     map(() => {
       return loadnoteSettings().pipe(
         map(([nt, nc]) => {
-          console.log(nt);
-          console.log(nc);
           // return of(nt);
           return process(nt, nc);
         }),

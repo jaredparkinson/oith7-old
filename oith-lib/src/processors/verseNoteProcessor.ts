@@ -1,11 +1,11 @@
-import {
-  NoteTypes,
-  NoteCategories,
-} from '../verse-notes/settings/note-gorup-settings';
-import { of, forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { filter, find, flatMap, map, toArray } from 'rxjs/operators';
 import { flatMap$ } from '../main';
-import { flatMap, map, find, toArray, filter } from 'rxjs/operators';
-import Note, { NoteRef, VerseNote } from '../verse-notes/verse-note';
+import {
+  NoteCategories,
+  NoteTypes,
+} from '../verse-notes/settings/note-gorup-settings';
+import { Note, NoteRef, VerseNote } from '../verse-notes/verse-note';
 
 function parseVerseNoteElementID($: CheerioStatic, element: CheerioElement) {
   if (element.attribs['id'] === '') {
@@ -41,7 +41,7 @@ function parseNoteCategory(
   if (nc) {
     $(noteRefLabel).remove();
     // noteRefLabel.parent.;
-    return of(nc.noteCategory);
+    return of(nc.category);
   }
   // console.log(not);
 

@@ -1,13 +1,13 @@
-import { VerseNote, Offsets } from '../verse-notes/verse-note';
+import { VerseNote, Offsets, Doc, DocType } from '../verse-notes/verse-note';
 export class Verse {
   public id: string;
   public text: string;
 
-  public formatGroups: FormatGroup[];
+  public grps: FormatGroup[];
   public constructor(id: string, text: string, formatGroups: FormatGroup[]) {
     this.id = id;
     this.text = text;
-    this.formatGroups = formatGroups;
+    this.grps = formatGroups;
   }
 }
 
@@ -15,20 +15,22 @@ export class FormatText implements Offsets {
   public id: string;
   public offsets?: string | undefined;
   public uncompressedOffsets?: number[] | undefined;
+  public docType: DocType = DocType.FORMATTEXT;
 
   // public off
 }
 export class FormatGroup {
-  public grps?: FormatGroup[];
-  public cls: string[];
-  public txt?: FormatText;
+  public grps?: (FormatGroup | FormatText)[];
+  public name?: string;
+  // public txt?: FormatText;
   public verseIDs?: string[];
   public verses?: Verse[];
   public attrs?: {};
+  public docType: DocType = DocType.FORMATGROUP;
 }
 
-export class Chapter {
-  public id: string;
+export class Chapter extends Doc {
+  // public id: string;
   public _rev?: string | undefined;
   // public chapterVerseBreaks?: ChapterVerseBreaks;
   // public docType = DocTypes.chapter;
@@ -51,7 +53,8 @@ export class Chapter {
     verses: Verse[],
     body: FormatGroup,
   ) {
-    this.id = id;
+    super(id, DocType.CHAPTER);
+    // this.id = id;
     this.lang = lang;
     this.title = title;
     this.shortTitle = shortTitle;
