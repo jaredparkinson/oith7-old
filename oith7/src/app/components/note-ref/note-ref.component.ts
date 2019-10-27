@@ -1,5 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { NoteRef } from '../../../../../oith-lib/src/verse-notes/verse-note';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { of } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-note-ref',
@@ -8,7 +11,18 @@ import { NoteRef } from '../../../../../oith-lib/src/verse-notes/verse-note';
 })
 export class NoteRefComponent implements OnInit {
   @Input() public noteRef: NoteRef;
-  constructor() {}
 
-  ngOnInit() {}
+  public safeNoteRef: SafeHtml;
+  constructor(public domSanitizer: DomSanitizer) {}
+
+  ngOnInit() {
+    of(this.noteRef)
+      .pipe(
+        filter(o => o !== undefined),
+        map(nR => {
+          this.safeNoteRef = this.domSanitizer.bypassSecurityTrustHtml(nR.text);
+        })
+      )
+      .subscribe();
+  }
 }
