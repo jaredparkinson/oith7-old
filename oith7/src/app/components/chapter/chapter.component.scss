@@ -1,3 +1,12 @@
 oith-chapter-parent {
   height: 100%;
+
+  oith-chapter {
+    height: calc(100vh - 70px);
+    overflow-y: scroll;
+    display: block;
+    white-space {
+      display: block;
+    }
+  }
 }

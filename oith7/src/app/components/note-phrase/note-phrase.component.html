@@ -1,1 +1,4 @@
-<p>note-phrase works!</p>
+<note-phrase
+  *ngIf="this.safePhrase"
+  [innerHtml]="this.safePhrase"
+></note-phrase>

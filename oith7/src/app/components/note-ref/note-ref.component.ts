@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { NoteRef } from '../../../../../oith-lib/src/verse-notes/verse-note';
 
 @Component({
   selector: 'app-note-ref',
@@ -6,10 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./note-ref.component.scss']
 })
 export class NoteRefComponent implements OnInit {
+  @Input() public noteRef: NoteRef;
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

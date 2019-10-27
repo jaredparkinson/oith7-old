@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Sanitizer } from '@angular/core';
+import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-note-phrase',
@@ -6,10 +7,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./note-phrase.component.scss']
 })
 export class NotePhraseComponent implements OnInit {
+  @Input() public notePhrase: string;
 
-  constructor() { }
+  public safePhrase?: SafeHtml;
+  constructor(public sanitizer: DomSanitizer) {}
 
   ngOnInit() {
+    this.safePhrase = this.sanitizer.bypassSecurityTrustHtml(this.notePhrase);
   }
-
 }

@@ -1,1 +1,9 @@
-<p>note works!</p>
+<note *ngIf="this.note" [id]="this.note.id">
+  <app-note-phrase [notePhrase]="this.note.phrase"></app-note-phrase>
+  <ng-container *ngIf="this.note.ref">
+    <app-note-ref
+      [noteRef]="noteRef"
+      *ngFor="let noteRef of this.note.ref"
+    ></app-note-ref>
+  </ng-container>
+</note>

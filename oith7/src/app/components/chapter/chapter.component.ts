@@ -42,7 +42,7 @@ export class ChapterComponent implements OnInit {
           return forkJoin(
             addVersesToBody(this.chapter),
             generateVerseNoteShell(this.chapter).pipe(
-              map(o => ((this.chapter as Chapter).verseNotes = o))
+              map(o => ((this.chapter as Chapter).sortVerseNotes = o))
             )
           );
         }),
