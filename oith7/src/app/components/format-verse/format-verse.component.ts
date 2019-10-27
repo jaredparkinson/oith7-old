@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import {
+  FormatGroup,
+  Verse
+} from '../../../../../oith-lib/src/processors/Chapter';
 
 @Component({
   selector: 'app-format-verse',
@@ -6,10 +10,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./format-verse.component.scss']
 })
 export class FormatVerseComponent implements OnInit {
+  @Input() verse: Verse;
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

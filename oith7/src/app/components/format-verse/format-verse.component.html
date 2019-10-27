@@ -1,1 +1,8 @@
-<p>format-verse works!</p>
+<oith-verse [id]="verse.id" style="display: block;"
+  >{{ verse.text }}
+  <ng-container *ngIf="verse.grps && verse.grps.length !== undefined">
+    <ng-container *ngFor="let grp of verse.grps">
+      <app-format-group [formatGroup]="grp"></app-format-group>
+    </ng-container>
+  </ng-container>
+</oith-verse>
