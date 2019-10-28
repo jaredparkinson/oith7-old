@@ -11,11 +11,20 @@ export class Verse {
   }
 }
 
+export class FormatMerged {
+  text: string;
+
+  public constructor(text: string) {
+    this.text = text;
+  }
+}
+
 export class FormatText implements Offsets {
   public id: string;
   public offsets?: string | undefined;
   public uncompressedOffsets?: number[] | undefined;
   public docType: DocType = DocType.FORMATTEXT;
+  public formatMerged?: FormatMerged[];
 
   // public off
 }

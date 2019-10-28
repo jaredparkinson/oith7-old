@@ -10,6 +10,7 @@ import {
   generateVerseNoteShell
 } from '../../../../../oith-lib/src/shells/build-shells';
 import { flatMap$ } from '../../../../../oith-lib/src/rx/flatMap$';
+import { BuildShellService } from 'src/app/services/build-shell.service';
 @Component({
   selector: 'app-chapter',
   templateUrl: './chapter.component.html',
@@ -20,7 +21,8 @@ export class ChapterComponent implements OnInit {
   constructor(
     public router: Router,
     public activatedRoute: ActivatedRoute,
-    public httpClient: HttpClient
+    public httpClient: HttpClient,
+    public buildShellService: BuildShellService
   ) {}
 
   public ngOnInit() {
@@ -30,7 +32,9 @@ export class ChapterComponent implements OnInit {
       .pipe(
         map(params =>
           this.httpClient.get(
-            `assets/scripture_files/eng-${params['book']}-${params['chapter']}-chapter.json`,
+            `assets/scripture_files/eng-${params['book']}-${
+              (params['chapter'] as string).split('.')[0]
+            }-chapter.json`,
             { responseType: 'json' }
           )
         ),
@@ -43,7 +47,8 @@ export class ChapterComponent implements OnInit {
             addVersesToBody(this.chapter),
             generateVerseNoteShell(this.chapter).pipe(
               map(o => ((this.chapter as Chapter).sortVerseNotes = o))
-            )
+            ),
+            this.buildShellService.buildNewShell(this.chapter)
           );
         }),
         flatMap(o => o)

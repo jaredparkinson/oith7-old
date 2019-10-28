@@ -142,7 +142,17 @@ function parseVerseFormat(
         .toArray(),
     ).pipe(
       flatMap$,
-      map(i => forkJoin(of($(i)), parseVerseFormat($, $(i), count))),
+      map(i => {
+        console.log(
+          $(i)
+            .contents()
+            .toArray()
+            .filter(o => o.type === 'text')
+            .map(o => (o.data ? o.data.length : 0)),
+        );
+
+        return forkJoin(of($(i)), parseVerseFormat($, $(i), count));
+      }),
       flatMap(o => o),
       map(
         ([e, ft]): FormatGroup => {
