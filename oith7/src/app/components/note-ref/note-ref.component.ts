@@ -20,7 +20,9 @@ export class NoteRefComponent implements OnInit {
       .pipe(
         filter(o => o !== undefined),
         map(nR => {
-          this.safeNoteRef = this.domSanitizer.bypassSecurityTrustHtml(nR.text);
+          this.safeNoteRef = this.domSanitizer.bypassSecurityTrustHtml(
+            nR.text ? nR.text : ''
+          );
         })
       )
       .subscribe();
