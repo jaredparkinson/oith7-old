@@ -1,24 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
-@import "./normalize.scss";
-@import "./app/styles/notes.scss";
-@import "./default-styles.scss";
+@import './normalize.scss';
+@import './app/styles/notes.scss';
+@import './default-styles.scss';
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  line-height: 1;
+  font-size: 18px;
 }
 
 format-group {
+  font-family: serif;
   line-height: 1.5;
-  &[nodename="span"],
-  &[nodename="SPAN"] {
+  &[nodename='span'],
+  &[nodename='SPAN'] {
     display: inline;
   }
-  &[nodename="br"] {
+  &[nodename='br'] {
     display: block;
   }
-  &[nodename="HEADER"] {
-    [id*="title1"] {
+  &[nodename='HEADER'] {
+    [id*='title1'] {
       text-align: center;
       font-weight: 700;
       text-align: center;
@@ -27,6 +30,13 @@ format-group {
       font-weight: 700 !important;
       font-size: 24px;
       margin-bottom: 9pt;
+    }
+    [id*='title_number'] {
+      font-size: 1.1em;
+      padding-bottom: 0.5em;
+      padding-top: 0;
+      text-align: center;
+      letter-spacing: 0.1em;
     }
   }
 }
