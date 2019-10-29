@@ -7,6 +7,9 @@
         <app-format-group [formatGroup]="grp"></app-format-group>
       </ng-container>
     </ng-container>
+    <ng-container *ngIf="formatGroup.docType === 5">
+      <app-format-text [formatText]="formatGroup"></app-format-text>
+    </ng-container>
   </ng-container>
   <ng-container *ngIf="this.formatGroup.verses">
     <ng-container *ngFor="let verse of formatGroup.verses">

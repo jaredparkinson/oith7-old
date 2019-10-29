@@ -16,5 +16,6 @@ export function parseDocID($: CheerioStatic): Observable<string> {
       );
     }
   }
-  throw new Error('No valid data-uri found');
+  return EMPTY;
+  // throw new Error('No valid data-uri found');
 }

@@ -25,6 +25,7 @@ export class FormatText implements Offsets {
   public uncompressedOffsets?: number[] | undefined;
   public docType: DocType = DocType.FORMATTEXT;
   public formatMerged?: FormatMerged[];
+  // public text: string;
 
   // public off
 }

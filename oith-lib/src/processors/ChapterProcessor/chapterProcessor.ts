@@ -103,17 +103,21 @@ function parseText(e: Cheerio) {
 
 function parseVerseFormat(
   $: CheerioStatic,
-  verseE: Cheerio,
+  verseE: CheerioElement,
   count: { count: number },
 ): Observable<FormatGroup[] | FormatText[]> {
-  const isTextNode =
-    $(verseE)
-      .children()
-      .toArray().length === 0;
+  const isTextNode = verseE.type === 'text';
+  $(verseE)
+    .children()
+    .toArray().length === 0;
+  // console.log(verseE);
 
   const b = $(verseE).text().length;
-
+  // console.log(b);
+  // verseE.n
   if (isTextNode) {
+    // console.log(verseE);
+
     const offsets = [count.count, count.count + b];
     let ft: FormatText;
     if (offsets[0] === offsets[1]) {
@@ -122,6 +126,7 @@ function parseVerseFormat(
         offsets: '',
         uncompressedOffsets: undefined,
         docType: DocType.FORMATTEXT,
+        // text: '',
       };
     } else {
       ft = {
@@ -129,36 +134,47 @@ function parseVerseFormat(
         offsets: `${count.count}-${count.count + b - 1}`,
         uncompressedOffsets: undefined,
         docType: DocType.FORMATTEXT,
+        // text: $(verseE).text(),
       };
 
       count.count = count.count + b;
     }
 
+    // console.log(ft);
+
     return of([ft]);
   } else {
+    // console.log(
+    // $(verseE)
+    // .children()
+    // .toArray()
+    // .map(n => n.children),
+    // );
+
     return of(
-      $(verseE)
-        .children()
-        .toArray(),
+      verseE.children,
+      // .toArray(),
     ).pipe(
       flatMap$,
       map(i => {
-        console.log(
-          $(i)
-            .contents()
-            .toArray()
-            .filter(o => o.type === 'text')
-            .map(o => (o.data ? o.data.length : 0)),
-        );
+        // console.log(
+        //   $(i)
+        //     .contents()
+        //     .toArray()
+        //     .filter(o => o.type === 'text')
+        //     .map(o => (o.data ? o.data.length : 0)).length,
+        // );
 
-        return forkJoin(of($(i)), parseVerseFormat($, $(i), count));
+        return forkJoin(of(i), parseVerseFormat($, i, count));
       }),
       flatMap(o => o),
       map(
         ([e, ft]): FormatGroup => {
+          // console.log(e.name);
+
           return {
             attrs: $(e).attr(),
-            name: undefined,
+            name: e.name,
             grps: ft,
             verseIDs: undefined,
             verses: undefined,
@@ -181,10 +197,10 @@ function parseID(e: Cheerio) {
   return of(parseVerseID(e.prop('id')));
 }
 
-function parseVerse($: CheerioStatic, verseE: Cheerio) {
+function parseVerse($: CheerioStatic, verseE: CheerioElement) {
   return forkJoin(
-    parseID(verseE),
-    parseText(verseE),
+    parseID($(verseE)),
+    parseText($(verseE)),
     parseVerseFormat($, verseE, { count: 0 }),
   ).pipe(
     map(
@@ -198,7 +214,7 @@ function parseVerse($: CheerioStatic, verseE: Cheerio) {
 function parseVerses($: CheerioStatic) {
   return of($('body [data-aid]').toArray()).pipe(
     flatMap$,
-    map(o => parseVerse($, $(o))),
+    map(o => parseVerse($, o)),
     flatMap$,
     toArray(),
   );
