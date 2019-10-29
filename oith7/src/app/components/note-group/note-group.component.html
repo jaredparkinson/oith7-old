@@ -1,4 +1,10 @@
-<note-group *ngIf="verseNoteGroup">
+<note-group
+  *ngIf="
+    verseNoteGroup &&
+    verseNoteGroup.formatTag &&
+    verseNoteGroup.formatTag.visible
+  "
+>
   <app-note-phrase
     [notePhrase]="verseNoteGroup.notes[0].phrase"
   ></app-note-phrase>
