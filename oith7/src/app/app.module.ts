@@ -18,6 +18,7 @@ import { VerseNoteComponent } from './components/verse-note/verse-note.component
 import { NoteComponent } from './components/note/note.component';
 import { NotePhraseComponent } from './components/note-phrase/note-phrase.component';
 import { NoteRefComponent } from './components/note-ref/note-ref.component';
+import { NoteGroupComponent } from './components/note-group/note-group.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { NoteRefComponent } from './components/note-ref/note-ref.component';
     VerseNoteComponent,
     NoteComponent,
     NotePhraseComponent,
-    NoteRefComponent
+    NoteRefComponent,
+    NoteGroupComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],

@@ -1,0 +1,6 @@
+<note-group *ngIf="verseNoteGroup">
+  <app-note-phrase
+    [notePhrase]="verseNoteGroup.notes[0].phrase"
+  ></app-note-phrase>
+  <app-note *ngFor="let note of verseNoteGroup.notes" [note]="note"></app-note>
+</note-group>

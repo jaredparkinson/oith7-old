@@ -1,8 +1,12 @@
 <verse-note *ngIf="this.verseNote">
-  <ng-container *ngIf="this.verseNote.notes">
-    <app-note
-      [note]="note"
-      *ngFor="let note of this.verseNote.notes"
-    ></app-note>
+  <ng-container *ngIf="this.verseNote.noteGroups">
+    <app-note-group
+      *ngFor="let noteGroup of this.verseNote.noteGroups"
+      [verseNoteGroup]="noteGroup"
+    ></app-note-group>
+    <!-- <app-note -->
+    <!-- [note]="note" -->
+    <!-- *ngFor="let note of this.verseNote.notes" -->
+    <!-- ></app-note> -->
   </ng-container>
 </verse-note>
