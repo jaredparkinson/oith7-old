@@ -1,8 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
-@import './normalize.scss';
-@import './app/styles/notes.scss';
+@import "./normalize.scss";
+@import "./app/styles/notes.scss";
+@import "./default-styles.scss";
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+format-group {
+  &[nodename="span"],
+  &[nodename="SPAN"] {
+    display: inline;
+  }
+  &[nodename="br"] {
+    display: block;
+  }
+  &[nodename="HEADER"] {
+    [id*="title"] {
+      text-align: center;
+      text-align: center;
+      display: block !important;
+      margin-bottom: 9pt;
+    }
+  }
 }

@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   Chapter,
   Verse,
   FormatGroup,
   FormatText,
   FormatMerged
-} from '../../../../oith-lib/src/processors/Chapter';
-import { of, forkJoin, Observable, EMPTY } from 'rxjs';
-import { flatMap$ } from '../../../../oith-lib/src/rx/flatMap$';
-import { map, toArray } from 'rxjs/operators';
-import { DocType } from '../../../../oith-lib/src/verse-notes/verse-note';
+} from "../../../../oith-lib/src/processors/Chapter";
+import { of, forkJoin, Observable, EMPTY } from "rxjs";
+import { flatMap$ } from "../../../../oith-lib/src/rx/flatMap$";
+import { map, toArray } from "rxjs/operators";
+import { DocType } from "../../../../oith-lib/src/verse-notes/verse-note";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class BuildShellService {
   constructor() {}
@@ -37,9 +37,9 @@ export class BuildShellService {
   }
 
   private addTextToFormatText(verse: Verse, formatText: FormatText) {
-    console.log(formatText);
+    // console.log(formatText);
     if (formatText.offsets) {
-      const split = formatText.offsets.split('-');
+      const split = formatText.offsets.split("-");
       return of(
         (formatText.formatMerged = [
           new FormatMerged(
