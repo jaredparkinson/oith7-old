@@ -8,8 +8,12 @@ import {
 } from "../../../../oith-lib/src/processors/Chapter";
 import { of, forkJoin, Observable, EMPTY } from "rxjs";
 import { flatMap$ } from "../../../../oith-lib/src/rx/flatMap$";
-import { map, toArray } from "rxjs/operators";
-import { DocType } from "../../../../oith-lib/src/verse-notes/verse-note";
+import { map, toArray, groupBy, mergeMap, flatMap } from "rxjs/operators";
+import {
+  DocType,
+  VerseNote,
+  VerseNoteGroup
+} from "../../../../oith-lib/src/verse-notes/verse-note";
 
 @Injectable({
   providedIn: "root"
@@ -31,7 +35,6 @@ export class BuildShellService {
     } else if ((verse as FormatText).docType === DocType.FORMATTEXT) {
       return of(verse as FormatText);
     }
-    console.log(verse);
 
     return EMPTY;
   }
@@ -57,7 +60,7 @@ export class BuildShellService {
       map(o => this.addTextToFormatText(verse, o)),
       flatMap$,
       toArray(),
-      map(o => console.log(o))
+      map(o => o)
     );
     // return of(verse).pipe(map(v => console.log(v.grps)));
   }
@@ -75,9 +78,49 @@ export class BuildShellService {
     return of(verses);
   }
 
+  private generateVerseNoteGroups(verseNotea?: VerseNote[]) {
+    if (verseNotea) {
+      return of(verseNotea).pipe(
+        flatMap$,
+        map(vN => {
+          if (vN.notes) {
+            return of(vN.notes).pipe(
+              flatMap$,
+              groupBy(n => n.phrase),
+              mergeMap(o =>
+                o.pipe(
+                  toArray(),
+                  map(
+                    (notes): VerseNoteGroup => {
+                      const n = notes.sort((a, b) => a.noteType - b.noteType);
+                      return new VerseNoteGroup(notes, "");
+                    }
+                  )
+                )
+              ),
+              toArray(),
+              map(ng => {
+                console.log(ng);
+                vN.noteGroups = ng;
+              })
+            );
+          }
+          return EMPTY;
+        }),
+        flatMap(o => o),
+        toArray()
+      );
+    }
+
+    return EMPTY;
+  }
+
   public buildNewShell(chapter: Chapter) {
     console.log(chapter);
 
-    return forkJoin(this.resetVerses(chapter.verses));
+    return forkJoin(
+      this.resetVerses(chapter.verses),
+      this.generateVerseNoteGroups(chapter.verseNotes)
+    );
   }
 }

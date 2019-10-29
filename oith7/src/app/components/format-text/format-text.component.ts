@@ -10,7 +10,5 @@ export class FormatTextComponent implements OnInit {
   @Input() public formatText: FormatText;
   constructor() {}
 
-  ngOnInit() {
-    console.log(this.formatText);
-  }
+  ngOnInit() {}
 }

@@ -2,6 +2,7 @@
   class="{{ this.cls }}"
   [attr.nodeName]="this.formatGroup.name"
   [ngClass]="{ 'has-href': this.hasHref }"
+  (click)="click()"
 >
   <ng-container *ngIf="this.formatGroup">
     <ng-container *ngIf="this.formatGroup.grps">

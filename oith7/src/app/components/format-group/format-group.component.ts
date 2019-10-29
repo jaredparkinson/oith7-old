@@ -3,6 +3,7 @@ import { FormatGroup } from "../../../../../oith-lib/src/processors/Chapter";
 import { of, forkJoin } from "rxjs";
 import { filter, map, flatMap, find } from "rxjs/operators";
 import { flatMap$ } from "../../../../../oith-lib/src/rx/flatMap$";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-format-group",
@@ -13,7 +14,7 @@ export class FormatGroupComponent implements OnInit {
   @Input() public formatGroup: FormatGroup;
   public cls: string = "";
   public hasHref?: boolean;
-  constructor() {}
+  constructor(public router: Router) {}
 
   ngOnInit() {
     forkJoin(this.setAttributes()).subscribe();
@@ -24,7 +25,7 @@ export class FormatGroupComponent implements OnInit {
       this.formatGroup.attrs !== undefined &&
       this.formatGroup.attrs["href"] !== undefined
     ) {
-      console.log(this.formatGroup.attrs);
+      // console.log(this.formatGroup.attrs/);
     }
     return forkJoin(
       of(this.formatGroup.attrs as {}).pipe(
@@ -44,5 +45,17 @@ export class FormatGroupComponent implements OnInit {
         this.formatGroup.attrs["href"] &&
         !(this.formatGroup.attrs["href"] as string).includes("#note"))
     );
+  }
+
+  public click() {
+    if (this.formatGroup.attrs) {
+      if (this.formatGroup.attrs["href"]) {
+        return of(
+          this.router.navigateByUrl(`${this.formatGroup.attrs["href"]}`)
+        )
+          .pipe(flatMap$)
+          .subscribe();
+      }
+    }
   }
 }

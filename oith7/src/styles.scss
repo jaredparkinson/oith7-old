@@ -9,6 +9,7 @@ body {
 }
 
 format-group {
+  line-height: 1.5;
   &[nodename="span"],
   &[nodename="SPAN"] {
     display: inline;
@@ -17,10 +18,14 @@ format-group {
     display: block;
   }
   &[nodename="HEADER"] {
-    [id*="title"] {
+    [id*="title1"] {
       text-align: center;
+      font-weight: 700;
       text-align: center;
       display: block !important;
+      margin-bottom: 9pt;
+      font-weight: 700 !important;
+      font-size: 24px;
       margin-bottom: 9pt;
     }
   }

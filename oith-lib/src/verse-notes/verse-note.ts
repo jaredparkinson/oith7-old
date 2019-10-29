@@ -61,14 +61,14 @@ export class VerseNoteGroup {
   public notes: Note[] = [];
   public offsets: string;
 
-  public constructor(note: Note, id: string) {
-    this.offsets =
-      note.formatTag.offsets && note.formatTag.offsets !== ''
-        ? note.formatTag.offsets
-        : '100000';
+  public constructor(notes: Note[], id: string) {
+    // this.offsets =
+    // note.formatTag.offsets && note.formatTag.offsets !== ''
+    // ? note.formatTag.offsets
+    // : '100000';
     this.id = id;
-    this.notePhrase = note.phrase ? note.phrase : '';
-    this.notes.push(note);
+    // this.notePhrase = note.phrase ? note.phrase : '';
+    this.notes = notes;
   }
 }
 
@@ -80,6 +80,7 @@ export class VerseNote extends Doc {
   public notes?: Note[];
   public props?: FormatTagHighlight[];
   public vis?: boolean;
+  public noteGroups?: VerseNoteGroup[];
 
   public constructor(id: string, notes: Note[]) {
     super(id, DocType.VERSENOTE);

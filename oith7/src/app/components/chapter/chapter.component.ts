@@ -1,20 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { filter, map, flatMap } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
-import { Chapter } from '../../../../../oith-lib/src/processors/Chapter';
+import { Component, OnInit } from "@angular/core";
+import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
+import { forkJoin, of } from "rxjs";
+import { filter, map, flatMap } from "rxjs/operators";
+import { HttpClient } from "@angular/common/http";
+import { Chapter } from "../../../../../oith-lib/src/processors/Chapter";
 
 import {
   addVersesToBody,
   generateVerseNoteShell
-} from '../../../../../oith-lib/src/shells/build-shells';
-import { flatMap$ } from '../../../../../oith-lib/src/rx/flatMap$';
-import { BuildShellService } from 'src/app/services/build-shell.service';
+} from "../../../../../oith-lib/src/shells/build-shells";
+import { flatMap$ } from "../../../../../oith-lib/src/rx/flatMap$";
+import { BuildShellService } from "src/app/services/build-shell.service";
 @Component({
-  selector: 'app-chapter',
-  templateUrl: './chapter.component.html',
-  styleUrls: ['./chapter.component.scss']
+  selector: "app-chapter",
+  templateUrl: "./chapter.component.html",
+  styleUrls: ["./chapter.component.scss"]
 })
 export class ChapterComponent implements OnInit {
   public chapter?: Chapter;
@@ -26,22 +26,19 @@ export class ChapterComponent implements OnInit {
   ) {}
 
   public ngOnInit() {
-    console.log('oiasjdfoiajsdfoiajsdf');
-
     this.activatedRoute.params
       .pipe(
         map(params =>
           this.httpClient.get(
-            `assets/scripture_files/eng-${params['book']}-${
-              (params['chapter'] as string).split('.')[0]
+            `assets/scripture_files/eng-${params["book"]}-${
+              (params["chapter"] as string).split(".")[0]
             }-chapter.json`,
-            { responseType: 'json' }
+            { responseType: "json" }
           )
         ),
         flatMap(o => o),
         map(chapter => {
           this.chapter = chapter as Chapter;
-          console.log(this.chapter.verseNotes);
 
           return forkJoin(
             addVersesToBody(this.chapter),
@@ -58,8 +55,6 @@ export class ChapterComponent implements OnInit {
       // this.router.events.pipe(filter(o => o instanceof NavigationEnd)),
       this.activatedRoute.params
       // this.activatedRoute.queryParams
-    ).subscribe(([params]) => {
-      console.log(params);
-    });
+    ).subscribe(([params]) => {});
   }
 }
