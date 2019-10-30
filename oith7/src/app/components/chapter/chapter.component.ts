@@ -30,7 +30,9 @@ export class ChapterComponent implements OnInit {
       .pipe(
         map(params =>
           this.httpClient.get(
-            `assets/scripture_files/eng-${params["book"]}-${
+            `assets/scripture_files/${
+              params["lang"] ? params["lang"] : "eng"
+            }-${params["book"]}-${
               (params["chapter"] as string).split(".")[0]
             }-chapter.json`,
             { responseType: "json" }

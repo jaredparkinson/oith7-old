@@ -1,24 +1,58 @@
-<format-group
-  class="{{ this.cls }}"
-  [attr.nodeName]="this.formatGroup.name"
-  [ngClass]="{ 'has-href': this.hasHref }"
-  (click)="click()"
->
-  <ng-container *ngIf="this.formatGroup">
-    <ng-container *ngIf="this.formatGroup.grps">
-      <ng-container *ngFor="let grp of this.formatGroup.grps">
-        <!-- <ng-container *ngIf="grp.attrs">{{ grp.attrs }}</ng-container> -->
-
-        <app-format-group [formatGroup]="grp"></app-format-group>
+<ng-container [ngSwitch]="formatGroup.name">
+  <ruby
+    *ngSwitchCase="'ruby'"
+    class="{{ this.cls }}"
+    [attr.nodeName]="this.formatGroup.name"
+    [ngClass]="{ 'has-href': this.hasHref }"
+    (click)="click()"
+  >
+    <ng-container *ngIf="this.formatGroup">
+      <ng-container *ngIf="this.formatGroup.grps">
+        <ng-container *ngFor="let grp of this.formatGroup.grps">
+          <!-- <ng-container *ngIf="grp.attrs">{{ grp.attrs }}</ng-container> -->
+          <ng-container [ngSwitch]="grp.name">
+            <rt *ngSwitchCase="'rt'">
+              <app-format-group [formatGroup]="grp"></app-format-group>
+            </rt>
+            <rb *ngSwitchCase="'rb'">
+              <app-format-group [formatGroup]="grp"></app-format-group>
+            </rb>
+            <app-format-group
+              *ngSwitchDefault
+              [formatGroup]="grp"
+            ></app-format-group>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="formatGroup.docType === 5">
+        <app-format-text [formatText]="formatGroup"></app-format-text>
       </ng-container>
     </ng-container>
-    <ng-container *ngIf="formatGroup.docType === 5">
-      <app-format-text [formatText]="formatGroup"></app-format-text>
-    </ng-container>
-  </ng-container>
-  <ng-container *ngIf="this.formatGroup.verses">
-    <ng-container *ngFor="let verse of formatGroup.verses">
-      <app-format-verse [verse]="verse"></app-format-verse>
-    </ng-container>
-  </ng-container>
-</format-group>
+  </ruby>
+
+  <ng-container *ngSwitchDefault
+    ><format-group
+      class="{{ this.cls }}"
+      [attr.nodeName]="this.formatGroup.name"
+      [ngClass]="{ 'has-href': this.hasHref }"
+      (click)="click()"
+    >
+      <ng-container *ngIf="this.formatGroup">
+        <ng-container *ngIf="this.formatGroup.grps">
+          <ng-container *ngFor="let grp of this.formatGroup.grps">
+            <!-- <ng-container *ngIf="grp.attrs">{{ grp.attrs }}</ng-container> -->
+
+            <app-format-group [formatGroup]="grp"></app-format-group>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="formatGroup.docType === 5">
+          <app-format-text [formatText]="formatGroup"></app-format-text>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="this.formatGroup.verses">
+        <ng-container *ngFor="let verse of formatGroup.verses">
+          <app-format-verse [verse]="verse"></app-format-verse>
+        </ng-container>
+      </ng-container> </format-group
+  ></ng-container>
+</ng-container>
