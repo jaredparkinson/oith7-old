@@ -6,8 +6,8 @@
   <oith-chapter>
     <oith-content style="display: block; max-width: calc(100% - 96px);">
       <ng-container *ngIf="this.chapter">
-        <ng-container *ngFor="let b of this.chapter.body.grps">
-          <app-format-group [formatGroup]="b"></app-format-group>
+        <ng-container *ngFor="let grp of this.chapter.body.grps">
+          <app-format-group [formatGroup]="grp"></app-format-group>
         </ng-container>
       </ng-container>
       <white-space style="height: calc(100vh - 48px);"></white-space>
@@ -15,7 +15,7 @@
   </oith-chapter>
   <oith-verse-notes>
     <app-verse-notes
-      *ngIf="this.chapter.sortVerseNotes"
+      *ngIf="this.chapter && this.chapter.sortVerseNotes"
       [verseNotes]="this.chapter.sortVerseNotes"
     ></app-verse-notes>
   </oith-verse-notes>
