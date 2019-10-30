@@ -4,6 +4,7 @@ import { map, flatMap, toArray, filter, retry } from 'rxjs/operators';
 import { flatMap$ } from '../../rx/flatMap$';
 import { Verse, Chapter, FormatGroup, FormatText } from '../Chapter';
 import { DocType } from '../../verse-notes/verse-note';
+import { decode } from 'he';
 
 export const fixLink = map((i: Cheerio) => {
   const output = i.attr('href');
@@ -98,7 +99,7 @@ export const fixLink = map((i: Cheerio) => {
 });
 
 function parseText(e: Cheerio) {
-  return of(e.text());
+  return of(decode(e.text()));
 }
 
 function parseVerseFormat(
@@ -112,13 +113,14 @@ function parseVerseFormat(
     .toArray().length === 0;
   // console.log(verseE);
 
-  const b = $(verseE).text().length;
   // console.log(b);
   // verseE.n
-  if (isTextNode) {
-    // console.log(verseE);
 
-    const offsets = [count.count, count.count + b];
+  if (isTextNode) {
+    // console.log(verseE);log
+    const txt = decode($(verseE).text());
+
+    const offsets = [count.count, count.count + txt.length];
     let ft: FormatText;
     if (offsets[0] === offsets[1]) {
       ft = {
@@ -131,13 +133,13 @@ function parseVerseFormat(
     } else {
       ft = {
         id: '',
-        offsets: `${count.count}-${count.count + b - 1}`,
+        offsets: `${count.count}-${count.count + txt.length - 1}`,
         uncompressedOffsets: undefined,
         docType: DocType.FORMATTEXT,
         // text: $(verseE).text(),
       };
 
-      count.count = count.count + b;
+      count.count = count.count + txt.length;
     }
 
     // console.log(ft);
@@ -311,14 +313,16 @@ function parseBody($: CheerioStatic, cid: string) {
 
 function parseTitle($: CheerioStatic) {
   return of(
-    $('[type=citation]')
-      .first()
-      .text(),
+    decode(
+      $('[type=citation]')
+        .first()
+        .text(),
+    ),
   );
 }
 
 function parseShortTitle($: CheerioStatic) {
-  return of($('[type*=short-citation]').text());
+  return of(decode($('[type*=short-citation]').text()));
 }
 export function chapterProcessor($: CheerioStatic) {
   const header = $('header');
