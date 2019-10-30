@@ -1,8 +1,21 @@
-<oith-verse [id]="verse.id" style="display: block; width: 100%;">
-  <!-- {{ verse.text }} -->
-  <ng-container *ngIf="verse.grps && verse.grps.length !== undefined">
-    <ng-container *ngFor="let grp of verse.grps">
-      <app-format-group [formatGroup]="grp"></app-format-group>
-    </ng-container>
-  </ng-container>
-</oith-verse>
+<ng-container [ngSwitch]="verse.n">
+  <p *ngSwitchCase="'p'">
+    <oith-verse [id]="verse.id" style="display: block; width: 100%;">
+      <!-- {{ verse.text }} -->
+      <ng-container *ngIf="verse.grps && verse.grps.length !== undefined">
+        <ng-container *ngFor="let grp of verse.grps">
+          <app-format-group [formatGroup]="grp"></app-format-group>
+        </ng-container>
+      </ng-container>
+    </oith-verse>
+  </p>
+  <ng-container *ngSwitchDefault
+    ><oith-verse [id]="verse.id" style="display: block; width: 100%;">
+      <!-- {{ verse.text }} -->
+      <ng-container *ngIf="verse.grps && verse.grps.length !== undefined">
+        <ng-container *ngFor="let grp of verse.grps">
+          <app-format-group [formatGroup]="grp"></app-format-group>
+        </ng-container>
+      </ng-container> </oith-verse
+  ></ng-container>
+</ng-container>

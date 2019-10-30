@@ -21,6 +21,9 @@ import { NoteRefComponent } from './components/note-ref/note-ref.component';
 import { NoteGroupComponent } from './components/note-group/note-group.component';
 import { RubyComponent } from './components/ruby/ruby.component';
 import { ImgComponent } from './components/img/img.component';
+import { HeaderComponent } from './components/header/header.component';
+import { SectionComponent } from './components/section/section.component';
+import { FigureComponent } from './components/figure/figure.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +40,10 @@ import { ImgComponent } from './components/img/img.component';
     NoteRefComponent,
     NoteGroupComponent,
     RubyComponent,
-    ImgComponent
+    ImgComponent,
+    HeaderComponent,
+    SectionComponent,
+    FigureComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],

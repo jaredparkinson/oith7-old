@@ -207,7 +207,12 @@ function parseVerse($: CheerioStatic, verseE: CheerioElement) {
   ).pipe(
     map(
       ([id, text, tgs]): Verse => {
-        return new Verse(id, text, tgs as FormatGroup[]);
+        return new Verse(
+          id,
+          text,
+          tgs as FormatGroup[],
+          verseE.name.toLowerCase(),
+        );
       },
     ),
   );

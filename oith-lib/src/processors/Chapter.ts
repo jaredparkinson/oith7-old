@@ -2,12 +2,19 @@ import { VerseNote, Offsets, Doc, DocType } from '../verse-notes/verse-note';
 export class Verse {
   public id: string;
   public text: string;
+  public n: string;
 
   public grps: FormatGroup[];
-  public constructor(id: string, text: string, formatGroups: FormatGroup[]) {
+  public constructor(
+    id: string,
+    text: string,
+    formatGroups: FormatGroup[],
+    n: string,
+  ) {
     this.id = id;
     this.text = text;
     this.grps = formatGroups;
+    this.n = n;
   }
 }
 
