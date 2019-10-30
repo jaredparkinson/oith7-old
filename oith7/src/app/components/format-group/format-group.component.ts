@@ -47,12 +47,10 @@ export class FormatGroupComponent implements OnInit {
     );
   }
 
-  public click() {
-    if (this.formatGroup.attrs) {
-      if (this.formatGroup.attrs["href"]) {
-        return of(
-          this.router.navigateByUrl(`${this.formatGroup.attrs["href"]}`)
-        )
+  public click(formatGroup: FormatGroup) {
+    if (formatGroup.attrs) {
+      if (formatGroup.attrs["href"]) {
+        return of(this.router.navigateByUrl(`${formatGroup.attrs["href"]}`))
           .pipe(flatMap$)
           .subscribe();
       }

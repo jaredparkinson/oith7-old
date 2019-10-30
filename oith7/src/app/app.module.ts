@@ -19,6 +19,8 @@ import { NoteComponent } from './components/note/note.component';
 import { NotePhraseComponent } from './components/note-phrase/note-phrase.component';
 import { NoteRefComponent } from './components/note-ref/note-ref.component';
 import { NoteGroupComponent } from './components/note-group/note-group.component';
+import { RubyComponent } from './components/ruby/ruby.component';
+import { ImgComponent } from './components/img/img.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,9 @@ import { NoteGroupComponent } from './components/note-group/note-group.component
     NoteComponent,
     NotePhraseComponent,
     NoteRefComponent,
-    NoteGroupComponent
+    NoteGroupComponent,
+    RubyComponent,
+    ImgComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],
