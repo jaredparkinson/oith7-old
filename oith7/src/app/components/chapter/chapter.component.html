@@ -4,12 +4,14 @@
 >
   <oith-navigation></oith-navigation>
   <oith-chapter>
-    <ng-container *ngIf="this.chapter">
-      <ng-container *ngFor="let b of this.chapter.body.grps">
-        <app-format-group [formatGroup]="b"></app-format-group>
+    <oith-content style="display: block; max-width: calc(100% - 96px);">
+      <ng-container *ngIf="this.chapter">
+        <ng-container *ngFor="let b of this.chapter.body.grps">
+          <app-format-group [formatGroup]="b"></app-format-group>
+        </ng-container>
       </ng-container>
-    </ng-container>
-    <white-space style="height: calc(100vh - 48px);"></white-space>
+      <white-space style="height: calc(100vh - 48px);"></white-space>
+    </oith-content>
   </oith-chapter>
   <oith-verse-notes>
     <app-verse-notes

@@ -29,7 +29,7 @@
       </ng-container>
     </ng-container>
   </ruby>
-
+  <app-img *ngSwitchCase="'IMG'" [img]="formatGroup"></app-img>
   <ng-container *ngSwitchDefault
     ><format-group
       class="{{ this.cls }}"
