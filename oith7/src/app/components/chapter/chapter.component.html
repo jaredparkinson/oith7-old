@@ -3,7 +3,7 @@
   *ngIf="this.chapter"
 >
   <oith-navigation></oith-navigation>
-  <oith-chapter>
+  <oith-chapter [id]="chapter ? chapter.id : ''">
     <oith-content style="display: block; max-width: calc(100% - 96px);">
       <ng-container *ngIf="this.chapter">
         <ng-container *ngFor="let b of this.chapter.body.grps">
