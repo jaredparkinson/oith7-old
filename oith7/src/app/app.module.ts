@@ -24,6 +24,7 @@ import { ImgComponent } from './components/img/img.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SectionComponent } from './components/section/section.component';
 import { FigureComponent } from './components/figure/figure.component';
+import { FormatGroupsComponent } from './components/format-groups/format-groups.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { FigureComponent } from './components/figure/figure.component';
     ImgComponent,
     HeaderComponent,
     SectionComponent,
-    FigureComponent
+    FigureComponent,
+    FormatGroupsComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],
