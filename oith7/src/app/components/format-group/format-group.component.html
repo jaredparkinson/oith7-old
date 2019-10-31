@@ -31,9 +31,7 @@
   </ruby>
   <app-img *ngSwitchCase="'IMG'" [img]="formatGroup"></app-img>
   <header *ngSwitchCase="'HEADER'" class="{{ this.cls }}">
-    <app-format-groups
-      [formatGroups]="this.formatGroup.grps"
-    ></app-format-groups>
+    <app-format-groups [formatGroups]="this.formatGroup"></app-format-groups>
   </header>
   <!-- <section *ngSwitchCase="'SECTION'" class="{{ this.cls }}">
     <app-format-groups

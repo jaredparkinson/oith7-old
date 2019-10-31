@@ -1,7 +1,12 @@
-<ng-container *ngIf="this.formatGroups">
-  <ng-container *ngFor="let grp of this.formatGroups">
+<ng-container *ngIf="this.formatGroups.grps">
+  <ng-container *ngFor="let grp of this.formatGroups.grps">
     <!-- <ng-container *ngIf="grp.attrs">{{ grp.attrs }}</ng-container> -->
 
     <app-format-group [formatGroup]="grp"></app-format-group>
+  </ng-container>
+</ng-container>
+<ng-container *ngIf="formatGroups.verses"
+  ><ng-container *ngFor="let verse of formatGroups.verses">
+    <app-format-verse [verse]="verse"></app-format-verse>
   </ng-container>
 </ng-container>

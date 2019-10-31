@@ -1,10 +1,6 @@
 <ng-container [ngSwitch]="verse.n">
   <p *ngSwitchCase="'p'">
-    <oith-verse
-      [id]="verse.id"
-      style="display: block; width: 100%;"
-      [attr.nodename]="verse.n"
-    >
+    <oith-verse [id]="verse.id" style="display: block; width: 100%;">
       <!-- {{ verse.text }} -->
       <ng-container *ngIf="verse.grps && verse.grps.length !== undefined">
         <ng-container *ngFor="let grp of verse.grps">
@@ -14,7 +10,7 @@
     </oith-verse>
   </p>
   <ng-container *ngSwitchDefault
-    ><oith-verse [id]="verse.id" [attr.nodename]="verse.n">
+    ><oith-verse [id]="verse.id" style="display: block; width: 100%;">
       <!-- {{ verse.text }} -->
       <ng-container *ngIf="verse.grps">
         <ng-container *ngFor="let grp of verse.grps">
